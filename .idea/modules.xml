@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/back-eucaliptus-inventory.iml" filepath="$PROJECT_DIR$/.idea/back-eucaliptus-inventory.iml" />
+      <module fileurl="file://$PROJECT_DIR$/securityAPI/securityAPI.iml" filepath="$PROJECT_DIR$/securityAPI/securityAPI.iml" />
     </modules>
   </component>
 </project>
