@@ -6,6 +6,7 @@ import java.util.Set;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
@@ -24,24 +25,24 @@ public class User {
     @NotNull
     @NaturalId
     @Column(unique = true)
-    private String userName;
+    private String username;
     @NotNull
     private String email;
     @NotNull
     private String password;
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    public User() {
-    }
-
-    public User(@NotNull String userName, @NotNull String email, @NotNull String password, @NotNull Role role) {
-        this.userName = userName;
+    public User(@NotNull String username, @NotNull String email, @NotNull String password, @NotNull Role role) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
+    public User() {
+
+    }
 }
