@@ -1,12 +1,7 @@
 package com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;

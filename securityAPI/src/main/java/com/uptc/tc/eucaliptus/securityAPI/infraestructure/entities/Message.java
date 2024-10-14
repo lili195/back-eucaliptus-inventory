@@ -9,6 +9,6 @@ import lombok.*;
 @Getter
 @Setter
 public class Message {
-
+    @NotNull
     private String infoMessage;
 }

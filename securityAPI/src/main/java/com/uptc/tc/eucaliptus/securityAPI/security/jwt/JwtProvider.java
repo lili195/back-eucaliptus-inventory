@@ -1,13 +1,13 @@
 package com.uptc.tc.eucaliptus.securityAPI.security.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -35,13 +35,13 @@ public class JwtProvider {
             Jwts.parser().setSigningKey(getSignatureKey()).parseClaimsJws(token).getBody();
             return true;
         } catch (MalformedJwtException e) {
-            log.error("Token mal formado");
+            log.error("TokenEntity mal formado");
         } catch (UnsupportedJwtException e) {
-            log.error("Token no soportado");
+            log.error("TokenEntity no soportado");
         } catch (ExpiredJwtException e) {
-            log.error("Token expirado");
+            log.error("TokenEntity expirado");
         } catch (IllegalArgumentException e) {
-            log.error("Token vacío");
+            log.error("TokenEntity vacío");
         } catch (SignatureException e) {
             log.error("Fallo en la firma");
         }
@@ -55,7 +55,7 @@ public class JwtProvider {
 
     // Obtener la llave de seguridad codificada
     public Key getSignatureKey(){
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
