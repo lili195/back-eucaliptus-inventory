@@ -30,8 +30,14 @@ public class SellerService {
     public Optional<Seller> updateSeller(Long id, Seller sellerDetails) {
         return sellerRepository.findById(id).map(seller -> {
             seller.setUsername(sellerDetails.getUsername());
+            seller.setHomeAddress(sellerDetails.getHomeAddress());
+            seller.setDocumentType(sellerDetails.getDocumentType());
             return sellerRepository.save(seller);
         });
+    }
+
+    public boolean existsById(Long id) {
+        return sellerRepository.existsById(id);
     }
 
     public boolean deleteSeller(Long id) {

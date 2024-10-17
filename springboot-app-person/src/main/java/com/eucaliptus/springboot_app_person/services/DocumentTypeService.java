@@ -1,6 +1,7 @@
 package com.eucaliptus.springboot_app_person.services;
 
 
+import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.model.DocumentType;
 import com.eucaliptus.springboot_app_person.repository.DocumentTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,14 @@ public class DocumentTypeService {
             documentType.setNameType(documentTypeDetails.getNameType());
             return documentTypeRepository.save(documentType);
         });
+    }
+
+    public Optional<DocumentType> findByNameType(EnumDocumentType name){
+        return documentTypeRepository.findByNameType(name);
+    }
+
+    public boolean existsByDocumentType(EnumDocumentType name) {
+        return documentTypeRepository.existsByNameType(name);
     }
 
     public boolean deleteDocumentType(Long id) {

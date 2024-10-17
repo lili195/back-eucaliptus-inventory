@@ -1,6 +1,6 @@
 package com.eucaliptus.springboot_app_person.services;
 
-
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.model.Role;
 import com.eucaliptus.springboot_app_person.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,14 @@ public class RoleService {
 
     public Role saveRole(Role role) {
         return roleRepository.save(role);
+    }
+
+    public boolean existsRoleByName(EnumRole role) {
+        return roleRepository.existsByNameRole(role);
+    }
+
+    public Optional<Role> getRoleByName(EnumRole name) {
+        return roleRepository.findByNameRole(name);
     }
 
     public Optional<Role> updateRole(Long id, Role roleDetails) {

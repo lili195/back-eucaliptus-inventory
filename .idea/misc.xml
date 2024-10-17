@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/securityAPI/pom.xml" />
+        <option value="$PROJECT_DIR$/springboot-app-person/pom.xml" />
       </list>
     </option>
   </component>

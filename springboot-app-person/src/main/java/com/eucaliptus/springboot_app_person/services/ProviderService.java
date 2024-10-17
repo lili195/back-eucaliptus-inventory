@@ -27,6 +27,10 @@ public class ProviderService {
         return providerRepository.save(provider);
     }
 
+    public boolean existsById(Long id) {
+        return providerRepository.existsByIdProvider(id);
+    }
+
     public Optional<Provider> updateProvider(Long id, Provider providerDetails) {
         return providerRepository.findById(id).map(provider -> {
             provider.setPersonType(providerDetails.getPersonType());

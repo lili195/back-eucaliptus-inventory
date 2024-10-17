@@ -1,8 +1,13 @@
 package com.eucaliptus.springboot_app_person.model;
 
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "roles")
 public class Role {
 
@@ -12,15 +17,12 @@ public class Role {
     private Long idRole;
 
     @Column(name = "name_role", nullable = false)
-    private String nameRole;
+    @Enumerated(EnumType.STRING)
+    private EnumRole nameRole;
 
-    public Object getNameRole() {
-        return null;
+    public Role(EnumRole nameRole) {
+        this.nameRole = nameRole;
     }
+    public Role() {}
 
-    public void setNameRole(Object nameRole) {
-
-    }
-
-    // Getters y Setters
 }

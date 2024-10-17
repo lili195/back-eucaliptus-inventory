@@ -1,8 +1,16 @@
 package com.eucaliptus.springboot_app_person.model;
 
+import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Setter
+@Getter
+@NoArgsConstructor
 @Table(name = "document_types")
 public class DocumentType {
 
@@ -12,14 +20,11 @@ public class DocumentType {
     private Long idDocumentType;
 
     @Column(name = "name_type", nullable = false)
-    private String nameType;
+    @Enumerated(EnumType.STRING)
+    private EnumDocumentType nameType;
 
-    public Object getNameType() {
-        return null;
+    public DocumentType(@Nonnull EnumDocumentType nameType) {
+        this.nameType = nameType;
     }
 
-    public void setNameType(Object nameType) {
-    }
-
-    // Getters y Setters
 }
