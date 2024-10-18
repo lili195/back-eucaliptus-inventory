@@ -1,6 +1,7 @@
 package com.uptc.tc.eucaliptus.securityAPI.controllers;
 
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.LoginUser;
+import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.TokenDTO;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.UserDTO;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Message;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Role;
@@ -58,7 +59,8 @@ public class Controller {
 
             String token = jwtProvider.generateToken(loginUser.getUsername(), userService.getByUserName(username).get().getRole());
             tokenService.save(new TokenEntity(token, userService.getByUserName(username).get()));
-            return new ResponseEntity<>(token, HttpStatus.OK);
+            TokenDTO tokenDTO = new TokenDTO(token, jwtProvider.getAllClaims(token).get("role", String.class), username);
+            return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Message("Credenciales invalidas"), HttpStatus.BAD_REQUEST);
         }

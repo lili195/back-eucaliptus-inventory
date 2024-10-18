@@ -57,6 +57,10 @@ public class JwtProvider {
         return Jwts.parser().setSigningKey(getSignatureKey()).parseClaimsJws(token).getBody().getSubject();
     }
 
+    public Claims getAllClaims(String token) {
+        return Jwts.parser().setSigningKey(getSignatureKey()).parseClaimsJws(token).getBody();
+    }
+
     // Obtener la llave de seguridad codificada
     public Key getSignatureKey(){
         byte[] keyBytes = Base64.getDecoder().decode(secretKey);
