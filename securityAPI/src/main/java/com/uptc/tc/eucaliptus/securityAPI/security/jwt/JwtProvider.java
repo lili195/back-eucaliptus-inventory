@@ -1,5 +1,6 @@
 package com.uptc.tc.eucaliptus.securityAPI.security.jwt;
 
+import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,11 @@ public class JwtProvider {
     private String timeExpiration;
 
     // Generar token de acceso
-    public String generateToken(String username) {
+    public String generateToken(String username, Role role) {
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put("role", role.getRoleName().name());
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(timeExpiration)))

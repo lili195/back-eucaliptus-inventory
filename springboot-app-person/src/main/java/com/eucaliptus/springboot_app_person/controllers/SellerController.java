@@ -1,6 +1,5 @@
 package com.eucaliptus.springboot_app_person.controllers;
 
-
 import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
 import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.enums.EnumRole;
@@ -13,9 +12,12 @@ import com.eucaliptus.springboot_app_person.services.DocumentTypeService;
 import com.eucaliptus.springboot_app_person.services.PersonService;
 import com.eucaliptus.springboot_app_person.services.RoleService;
 import com.eucaliptus.springboot_app_person.services.SellerService;
+import io.jsonwebtoken.Jwt;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,7 +58,8 @@ public class SellerController {
     }
 
     @PostMapping("/addSeller")
-    public ResponseEntity<Object> createSeller(@RequestBody SellerDTO sellerDTO) {
+    public ResponseEntity<Object> createSeller(@RequestBody SellerDTO sellerDTO,
+                                               HttpServletRequest request) {
         try {
             if(personService.existsByIdPerson(sellerDTO.getPersonDTO().getIdPerson()))
                 return new ResponseEntity<>("Seller ya existente", HttpStatus.BAD_REQUEST);
@@ -76,6 +79,8 @@ public class SellerController {
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDTO, role, documentType);
             seller.setPerson(person);
             seller.setDocumentType(documentType);
+            if (!sellerService.createUser(sellerDTO, sellerService.getTokenByRequest(request)))
+                return new ResponseEntity<>("Intente de nuevo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.saveSeller(seller)), HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();

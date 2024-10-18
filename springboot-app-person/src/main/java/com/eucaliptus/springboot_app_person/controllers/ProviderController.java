@@ -12,12 +12,14 @@ import com.eucaliptus.springboot_app_person.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequestMapping("/person/providers")
 public class ProviderController {
 
@@ -45,7 +47,7 @@ public class ProviderController {
         try{
             if(!providerService.existsById(id))
                 return new ResponseEntity<>("Proveedor no encontrado", HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(providerService.getProviderById(id), HttpStatus.OK);
+            return new ResponseEntity<>(ProviderMapper.providerToProviderDTO(providerService.getProviderById(id).get()), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>("Intentalo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -89,9 +91,7 @@ public class ProviderController {
             provider.setPerson(personService.updatePerson(providerDetails.getPersonDTO().getIdPerson(), person).get());
             Company company = CompanyMapper.companyDTOToCompany(providerDetails.getCompanyDTO());
             provider.setCompany(companyService.update(company.getNitCompany(), company).get());
-            return new ResponseEntity<>(providerService.updateProvider(idProvider, provider)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build()), HttpStatus.OK);
+            return new ResponseEntity<>(ProviderMapper.providerToProviderDTO(providerService.updateProvider(idProvider, provider).get()), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>("Intente de nuevo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
         }

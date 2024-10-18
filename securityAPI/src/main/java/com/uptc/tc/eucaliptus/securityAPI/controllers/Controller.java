@@ -56,7 +56,7 @@ public class Controller {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             authenticationManager.authenticate(authenticationToken);
 
-            String token = jwtProvider.generateToken(loginUser.getUsername());
+            String token = jwtProvider.generateToken(loginUser.getUsername(), userService.getByUserName(username).get().getRole());
             tokenService.save(new TokenEntity(token, userService.getByUserName(username).get()));
             return new ResponseEntity<>(token, HttpStatus.OK);
         } catch (Exception e) {
@@ -74,7 +74,8 @@ public class Controller {
                 role);
         if(!userService.existByUserName(userDTO.getUsername())) {
             User userSaved = userService.save(userEntity);
-            return new ResponseEntity<>(userSaved, HttpStatus.CREATED);
+            UserDTO userSavedDTO = new UserDTO(userSaved.getUsername(), userSaved.getEmail(), userDTO.getPassword(), userDTO.getRole());
+            return new ResponseEntity<>(userSavedDTO, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(new Message("El usuario ya existe"), HttpStatus.CONFLICT);
         }
@@ -117,6 +118,12 @@ public class Controller {
     public ResponseEntity<Object> logout(HttpServletResponse response, HttpServletRequest request){
         tokenService.delete(request.getHeader("Authorization").substring(7));
         return new ResponseEntity<>(new Message("Se ha cerrado la sesion"), HttpStatus.OK);
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<Object> validate(@Valid @RequestBody String token) {
+        boolean isValid = tokenService.existsToken(token) && jwtProvider.isTokenValid(token);
+        return new ResponseEntity<>(isValid, HttpStatus.OK);
     }
 
 }

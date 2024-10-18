@@ -55,7 +55,7 @@ public class SecurityConfig {
                     configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
                     return configuration;
                 }))
-                .csrf(csrf -> csrf.disable())  // Nueva sintaxis para deshabilitar CSRF
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
                         .anyRequest().authenticated())
