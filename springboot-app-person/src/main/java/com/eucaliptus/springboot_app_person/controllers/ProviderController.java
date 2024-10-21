@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -60,7 +61,10 @@ public class ProviderController {
                 if (personService.getPersonById(providerDTO.getPersonDTO().getIdPerson()).get().isActive()) {
                     return new ResponseEntity<>(new Message("Provider ya existente"), HttpStatus.BAD_REQUEST);
                 }
-                existId = providerService.getProviderByPersonId(providerDTO.getPersonDTO().getIdPerson()).get().getIdProvider();
+                Optional<Provider> opProvider = providerService.getProviderByPersonId(providerDTO.getPersonDTO().getIdPerson());
+                if(opProvider.isPresent()) {
+                    existId = opProvider.get().getIdProvider();
+                }
             }
             Role role = new Role(EnumRole.valueOf(providerDTO.getPersonDTO().getRole()));
             Person person = PersonMapper.personDTOToPerson(providerDTO.getPersonDTO(), role);

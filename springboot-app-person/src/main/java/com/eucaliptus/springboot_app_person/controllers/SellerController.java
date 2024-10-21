@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -67,7 +68,10 @@ public class SellerController {
                 if (personService.getPersonById(sellerDTO.getPersonDTO().getIdPerson()).get().isActive()) {
                     return new ResponseEntity<>(new Message("Seller ya existente"), HttpStatus.BAD_REQUEST);
                 }
-                existId = sellerService.getSellerByPersonId(sellerDTO.getPersonDTO().getIdPerson()).get().getIdSeller();
+                Optional<Seller> opSeller = sellerService.getSellerByPersonId(sellerDTO.getPersonDTO().getIdPerson());
+                if(opSeller.isPresent()) {
+                    existId = opSeller.get().getIdSeller();
+                }
             }
             Role role = new Role(EnumRole.valueOf(sellerDTO.getPersonDTO().getRole()));
             Person person = PersonMapper.personDTOToPerson(sellerDTO.getPersonDTO(), role);
