@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="springboot-app-person" />
+        <module name="springboot-app-products" />
         <module name="securityAPI" />
       </profile>
     </annotationProcessing>
@@ -16,6 +17,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="securityAPI" options="-parameters" />
       <module name="springboot-app-person" options="-parameters" />
+      <module name="springboot-app-products" options="-parameters" />
     </option>
   </component>
 </project>
