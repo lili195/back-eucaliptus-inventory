@@ -53,7 +53,7 @@ public class SellerController {
         try{
             if(!sellerService.existsById(id))
                 return new ResponseEntity<>(new Message("Proveedor no encontrado"), HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(sellerService.getSellerById(id), HttpStatus.OK);
+            return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.getSellerById(id).get()), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -106,7 +106,6 @@ public class SellerController {
                     roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get(),
                     documentTypeService.findByNameType(EnumDocumentType.valueOf(sellerDetails.getDocumentType())).get());
             Person person = PersonMapper.personDTOToPerson(sellerDetails.getPersonDTO(), roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get());
-            //Person person = personService.getPersonById(sellerDetails.getPersonDTO().getIdPerson()).get();
             seller.setPerson(personService.updatePerson(sellerDetails.getPersonDTO().getIdPerson(), person).get());
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.updateSeller(idSeller, seller).get()), HttpStatus.OK);
         } catch (Exception e){
