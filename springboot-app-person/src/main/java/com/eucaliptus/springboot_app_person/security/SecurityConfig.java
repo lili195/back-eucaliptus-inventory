@@ -1,9 +1,6 @@
-package com.uptc.tc.eucaliptus.securityAPI.security;
+package com.eucaliptus.springboot_app_person.security;
 
-import com.uptc.tc.eucaliptus.securityAPI.security.jwt.JwtEntryPoint;
-import com.uptc.tc.eucaliptus.securityAPI.security.jwt.JwtTokenFilter;
-import com.uptc.tc.eucaliptus.securityAPI.utlities.ServicesUri;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.eucaliptus.springboot_app_person.utlities.ServicesUri;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,11 +9,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Service;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -25,12 +22,31 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-    @Autowired
-    private JwtEntryPoint jwtEntryPoint;
+
 
     @Bean
-    public JwtTokenFilter jwtTokenFilter() {
-        return new JwtTokenFilter();
+    public JwtRequestFilter jwtRequestFilter() {
+        return new JwtRequestFilter();
+    }
+
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOrigins(List.of(ServicesUri.FRONT_URL));
+                    configuration.setAllowedMethods(List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                    configuration.setAllowCredentials(true);
+                    configuration.addExposedHeader("Message");
+                    configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+                    return configuration;
+                }))
+            .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // Añadir el filtro de JWT antes del filtro de autenticación por token
+        http.addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
     @Bean
@@ -39,35 +55,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
-    @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(request -> {
-                    CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(List.of(ServicesUri.FRONT_URL,
-                            "https://dev-store-demo.web.app",
-                            "https://dev-store-demo.firebaseapp.com/"));
-                    configuration.setAllowedMethods(List.of("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-                    configuration.setAllowCredentials(true);
-                    configuration.addExposedHeader("Message");
-                    configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-                    return configuration;
-                }))
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login").permitAll()
-                        .anyRequest().authenticated())
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-
-    }
-
 }
