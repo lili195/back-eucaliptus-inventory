@@ -58,13 +58,11 @@ public class ProviderController {
         try {
             long existId = 0;
             if(personService.existsByIdPerson(providerDTO.getPersonDTO().getIdPerson())) {
-                if (personService.getPersonById(providerDTO.getPersonDTO().getIdPerson()).get().isActive()) {
-                    return new ResponseEntity<>(new Message("Provider ya existente"), HttpStatus.BAD_REQUEST);
-                }
+                if (personService.getPersonById(providerDTO.getPersonDTO().getIdPerson()).get().isActive())
+                    return new ResponseEntity<>(new Message("Persona ya existente"), HttpStatus.BAD_REQUEST);
                 Optional<Provider> opProvider = providerService.getProviderByPersonId(providerDTO.getPersonDTO().getIdPerson());
-                if(opProvider.isPresent()) {
+                if(opProvider.isPresent())
                     existId = opProvider.get().getIdProvider();
-                }
             }
             Role role = new Role(EnumRole.valueOf(providerDTO.getPersonDTO().getRole()));
             Person person = PersonMapper.personDTOToPerson(providerDTO.getPersonDTO(), role);
@@ -73,13 +71,9 @@ public class ProviderController {
                     roleService.saveRole(role) :
                     roleService.getRoleByName(role.getNameRole()).get();
             person.setRole(role);
-            person = (!personService.existsByIdPerson(person.getIdNumber())) ?
-                    personService.savePerson(person) :
-                    personService.getPersonById(person.getIdNumber()).get();
+            person = personService.savePerson(person);
             person.setActive(true);
-            company = (!companyService.existsByNItCompany(company.getNitCompany()) ?
-                    companyService.save(company) :
-                    companyService.findById(company.getNitCompany()).get());
+            company = companyService.save(company);
             Provider provider = ProviderMapper.providerDTOToProvider(providerDTO, role);
             provider.setPerson(person);
             provider.setCompany(company);

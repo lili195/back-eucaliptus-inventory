@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="springboot-app-person" />
         <module name="eureka-server" />
+        <module name="springboot-app-products" />
         <module name="securityAPI" />
       </profile>
     </annotationProcessing>
@@ -18,6 +19,7 @@
       <module name="eureka-server" options="-parameters" />
       <module name="securityAPI" options="-parameters" />
       <module name="springboot-app-person" options="-parameters" />
+      <module name="springboot-app-products" options="-parameters" />
     </option>
   </component>
 </project>

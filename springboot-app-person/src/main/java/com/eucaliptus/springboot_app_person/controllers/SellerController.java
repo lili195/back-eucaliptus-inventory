@@ -65,13 +65,11 @@ public class SellerController {
         try {
             long existId = 0;
             if(personService.existsByIdPerson(sellerDTO.getPersonDTO().getIdPerson())) {
-                if (personService.getPersonById(sellerDTO.getPersonDTO().getIdPerson()).get().isActive()) {
-                    return new ResponseEntity<>(new Message("Seller ya existente"), HttpStatus.BAD_REQUEST);
-                }
+                if (personService.getPersonById(sellerDTO.getPersonDTO().getIdPerson()).get().isActive())
+                    return new ResponseEntity<>(new Message("Persona ya existente"), HttpStatus.BAD_REQUEST);
                 Optional<Seller> opSeller = sellerService.getSellerByPersonId(sellerDTO.getPersonDTO().getIdPerson());
-                if(opSeller.isPresent()) {
+                if(opSeller.isPresent())
                     existId = opSeller.get().getIdSeller();
-                }
             }
             Role role = new Role(EnumRole.valueOf(sellerDTO.getPersonDTO().getRole()));
             Person person = PersonMapper.personDTOToPerson(sellerDTO.getPersonDTO(), role);
@@ -80,9 +78,7 @@ public class SellerController {
                     roleService.saveRole(role) :
                     roleService.getRoleByName(role.getNameRole()).get();
             person.setRole(role);
-            person = (!personService.existsByIdPerson(person.getIdNumber())) ?
-                    personService.savePerson(person) :
-                    personService.getPersonById(person.getIdNumber()).get();
+            person = personService.savePerson(person);
             person.setActive(true);
             documentType = (!documentTypeService.existsByDocumentType(documentType.getNameType())) ?
                     documentTypeService.saveDocumentType(documentType) :
@@ -105,14 +101,16 @@ public class SellerController {
     public ResponseEntity<Object> updateSeller(@PathVariable("id") Long idSeller, @RequestBody SellerDTO sellerDetails) {
         try {
             if(!sellerService.existsById(idSeller))
-                return new ResponseEntity<>(new Message("Este proveedor no existe"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDetails,
                     roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get(),
                     documentTypeService.findByNameType(EnumDocumentType.valueOf(sellerDetails.getDocumentType())).get());
             Person person = PersonMapper.personDTOToPerson(sellerDetails.getPersonDTO(), roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get());
+            //Person person = personService.getPersonById(sellerDetails.getPersonDTO().getIdPerson()).get();
             seller.setPerson(personService.updatePerson(sellerDetails.getPersonDTO().getIdPerson(), person).get());
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.updateSeller(idSeller, seller).get()), HttpStatus.OK);
         } catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -121,9 +119,9 @@ public class SellerController {
     public ResponseEntity<Object> deleteSeller(@PathVariable("id") Long idSeller, HttpServletRequest request) {
         try{
             if(!sellerService.existsById(idSeller))
-                return new ResponseEntity<>(new Message("Este proveedor no existe"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
             if(sellerService.deleteSeller(idSeller, sellerService.getTokenByRequest(request)))
-                return new ResponseEntity<>(new Message("Proveedor eliminado"), HttpStatus.OK);
+                return new ResponseEntity<>(new Message("Vendedor eliminado"), HttpStatus.OK);
             return new ResponseEntity<>(new Message("Error con la bd"), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
