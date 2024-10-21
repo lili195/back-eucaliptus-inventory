@@ -107,6 +107,7 @@ public class Controller {
     @DeleteMapping("/deleteSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteSeller(@RequestParam String username ){
+        System.out.println(username);
         if(userService.existByUserName(username)){
             tokenService.deleteByUserId(userService.getByUserName(username).get().getId());
             userService.delete(username);

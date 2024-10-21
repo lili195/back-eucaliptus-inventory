@@ -43,7 +43,8 @@ public class PersonService {
 
     public boolean deletePerson(String idNumber) {
         return personRepository.findByIdNumber(idNumber).map(person -> {
-            personRepository.delete(person);
+            person.setActive(false);
+            personRepository.save(person);
             return true;
         }).orElse(false);
     }

@@ -30,10 +30,14 @@ public class Provider {
     @JoinColumn(name = "nit_company", referencedColumnName = "nit_company")
     private Company company;
 
+    @Column(name = "active")
+    private boolean active;
+
     public Provider(Person person,
                     EnumPersonType personType, Company company){;
         this.person = person;
         this.personType = personType;
         this.company = company;
+        this.active = true;
     }
 }

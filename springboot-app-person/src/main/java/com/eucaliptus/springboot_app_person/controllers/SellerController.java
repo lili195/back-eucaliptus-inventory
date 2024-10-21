@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_person.controllers;
 
+import com.eucaliptus.springboot_app_person.dtos.Message;
 import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
 import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.enums.EnumRole;
@@ -40,20 +41,20 @@ public class SellerController {
     @GetMapping("/all")
     public ResponseEntity<Object> getAllSellers() {
         try {
-            return new ResponseEntity<>(sellerService.getAllSellers().stream().
+            return new ResponseEntity<>(sellerService.getAllActiveSellers().stream().
                     map(SellerMapper::sellerToSellerDTO).collect(Collectors.toList()), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Intente de nuevo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }    }
 
     @GetMapping("/getSellerById/{id}")
     public ResponseEntity<Object> getSellerById(@PathVariable Long id) {
         try{
             if(!sellerService.existsById(id))
-                return new ResponseEntity<>("Proveedor no encontrado", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Message("Proveedor no encontrado"), HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(sellerService.getSellerById(id), HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>("Intentalo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,8 +62,13 @@ public class SellerController {
     public ResponseEntity<Object> createSeller(@RequestBody SellerDTO sellerDTO,
                                                HttpServletRequest request) {
         try {
-            if(personService.existsByIdPerson(sellerDTO.getPersonDTO().getIdPerson()))
-                return new ResponseEntity<>("Seller ya existente", HttpStatus.BAD_REQUEST);
+            long existId = 0;
+            if(personService.existsByIdPerson(sellerDTO.getPersonDTO().getIdPerson())) {
+                if (personService.getPersonById(sellerDTO.getPersonDTO().getIdPerson()).get().isActive()) {
+                    return new ResponseEntity<>(new Message("Seller ya existente"), HttpStatus.BAD_REQUEST);
+                }
+                existId = sellerService.getSellerByPersonId(sellerDTO.getPersonDTO().getIdPerson()).get().getIdSeller();
+            }
             Role role = new Role(EnumRole.valueOf(sellerDTO.getPersonDTO().getRole()));
             Person person = PersonMapper.personDTOToPerson(sellerDTO.getPersonDTO(), role);
             DocumentType documentType = new DocumentType(EnumDocumentType.valueOf(sellerDTO.getDocumentType()));
@@ -73,18 +79,21 @@ public class SellerController {
             person = (!personService.existsByIdPerson(person.getIdNumber())) ?
                     personService.savePerson(person) :
                     personService.getPersonById(person.getIdNumber()).get();
+            person.setActive(true);
             documentType = (!documentTypeService.existsByDocumentType(documentType.getNameType())) ?
                     documentTypeService.saveDocumentType(documentType) :
                     documentTypeService.findByNameType(documentType.getNameType()).get();
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDTO, role, documentType);
             seller.setPerson(person);
             seller.setDocumentType(documentType);
+            if (existId != 0)
+                seller.setIdSeller(existId);
             if (!sellerService.createUser(sellerDTO, sellerService.getTokenByRequest(request)))
-                return new ResponseEntity<>("Intente de nuevo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.saveSeller(seller)), HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>("Intente de nuevo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -92,7 +101,7 @@ public class SellerController {
     public ResponseEntity<Object> updateSeller(@PathVariable("id") Long idSeller, @RequestBody SellerDTO sellerDetails) {
         try {
             if(!sellerService.existsById(idSeller))
-                return new ResponseEntity<>("Este proveedor no existe", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Message("Este proveedor no existe"), HttpStatus.BAD_REQUEST);
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDetails,
                     roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get(),
                     documentTypeService.findByNameType(EnumDocumentType.valueOf(sellerDetails.getDocumentType())).get());
@@ -100,12 +109,20 @@ public class SellerController {
             seller.setPerson(personService.updatePerson(sellerDetails.getPersonDTO().getIdPerson(), person).get());
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.updateSeller(idSeller, seller).get()), HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>("Intente de nuevo mas tarde", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/deleteSeller/{id}")
-    public ResponseEntity<Void> deleteSeller(@PathVariable Long id) {
-        return sellerService.deleteSeller(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<Object> deleteSeller(@PathVariable("id") Long idSeller, HttpServletRequest request) {
+        try{
+            if(!sellerService.existsById(idSeller))
+                return new ResponseEntity<>(new Message("Este proveedor no existe"), HttpStatus.BAD_REQUEST);
+            if(sellerService.deleteSeller(idSeller, sellerService.getTokenByRequest(request)))
+                return new ResponseEntity<>(new Message("Proveedor eliminado"), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("Error con la bd"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

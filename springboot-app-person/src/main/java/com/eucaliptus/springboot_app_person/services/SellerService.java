@@ -1,16 +1,19 @@
 package com.eucaliptus.springboot_app_person.services;
 
 
+import com.eucaliptus.springboot_app_person.dtos.Message;
 import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
 import com.eucaliptus.springboot_app_person.dtos.UserDTO;
 import com.eucaliptus.springboot_app_person.model.Seller;
 import com.eucaliptus.springboot_app_person.repository.SellerRepository;
 import com.eucaliptus.springboot_app_person.utlities.ServicesUri;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.swing.text.html.parser.Entity;
 import java.util.List;
@@ -29,8 +32,16 @@ public class SellerService {
         return sellerRepository.findAll();
     }
 
+    public List<Seller> getAllActiveSellers() {
+        return sellerRepository.findByActiveTrue();
+    }
+
     public Optional<Seller> getSellerById(Long id) {
         return sellerRepository.findById(id);
+    }
+
+    public Optional<Seller> getSellerByPersonId(String personId) {
+        return sellerRepository.findByPerson_IdNumber(personId);
     }
 
     public Seller saveSeller(Seller seller) {
@@ -51,6 +62,8 @@ public class SellerService {
                     entity,
                     UserDTO.class
             );
+            System.out.println(response.getStatusCode());
+            System.out.println(HttpStatus.CREATED);
             return response.getStatusCode() == HttpStatus.CREATED;
         } catch (Exception e){
             return false;
@@ -70,11 +83,33 @@ public class SellerService {
         return sellerRepository.existsById(id);
     }
 
-    public boolean deleteSeller(Long id) {
+    public boolean deleteSeller(Long id, String token) {
         return sellerRepository.findById(id).map(seller -> {
-            sellerRepository.delete(seller);
-            return true;
+            seller.setActive(false);
+            seller.getPerson().setActive(false);
+            sellerRepository.save(seller);
+            return deleteUserAccount(seller.getUsername(), token);
         }).orElse(false);
+    }
+
+    public boolean deleteUserAccount(String username, String token) {
+        try{
+            String url = UriComponentsBuilder
+                    .fromHttpUrl(ServicesUri.AUTH_SERVICE + "/auth/deleteSeller")
+                    .queryParam("username", username)
+                    .toUriString();
+            HttpEntity<Message> entity = new HttpEntity<>(getHeader(token));
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.DELETE,
+                    entity,
+                    String.class
+            );
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private HttpHeaders getHeader(String token){

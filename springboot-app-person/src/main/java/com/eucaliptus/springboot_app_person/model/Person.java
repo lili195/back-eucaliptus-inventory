@@ -31,6 +31,9 @@ public class Person {
     @JoinColumn(name = "id_role", referencedColumnName = "id_role")
     private Role role;
 
+    @Column(name = "active")
+    private boolean active;
+
     public Person(String idNumber, String firstName, String lastName, String email, String phoneNumber, Role role) {
         this.idNumber = idNumber;
         this.firstName = firstName;
@@ -38,5 +41,6 @@ public class Person {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
+        this.active = true;
     }
 }
