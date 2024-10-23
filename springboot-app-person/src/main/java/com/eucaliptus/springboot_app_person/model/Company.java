@@ -18,7 +18,7 @@ public class Company {
     @Column(name = "nit_company")
     private String nitCompany;
 
-    @Column(name = "name_company", nullable = false)
+    @Column(name = "name_company")
     private String nameCompany;
 
     @Column(name = "phone_number")
