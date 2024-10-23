@@ -32,6 +32,7 @@ public class PersonService {
             person.setLastName(personDetails.getLastName());
             person.setPhoneNumber(personDetails.getPhoneNumber());
             person.setEmail(personDetails.getEmail());
+            person.setDocumentType(personDetails.getDocumentType());
             person.setRole(personDetails.getRole());
             return personRepository.save(person);
         });

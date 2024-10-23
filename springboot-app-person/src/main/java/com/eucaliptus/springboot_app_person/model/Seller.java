@@ -22,10 +22,6 @@ public class Seller {
     @JoinColumn(name = "person_id", referencedColumnName = "id_number")
     private Person person;
 
-    @ManyToOne
-    @JoinColumn(name = "id_document_type", referencedColumnName = "id_document_type")
-    private DocumentType documentType;
-
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
@@ -36,10 +32,9 @@ public class Seller {
     private boolean active;
 
     public Seller(Person person,
-                  DocumentType documentType, String documentNumber, String username, String homeAddress) {
+                  String documentNumber, String username, String homeAddress) {
         this.person = person;
         this.person.setIdNumber(documentNumber);
-        this.documentType = documentType;
         this.username = username;
         this.homeAddress = homeAddress;
         this.active = true;

@@ -13,5 +13,6 @@ public class PersonDTO {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String documentType;
     private String role;
 }

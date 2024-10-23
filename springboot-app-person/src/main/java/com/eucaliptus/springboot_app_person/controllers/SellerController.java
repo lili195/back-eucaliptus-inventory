@@ -71,20 +71,20 @@ public class SellerController {
                     existId = opSeller.get().getIdSeller();
             }
             Role role = new Role(EnumRole.valueOf(sellerDTO.getPersonDTO().getRole()));
-            Person person = PersonMapper.personDTOToPerson(sellerDTO.getPersonDTO(), role);
-            DocumentType documentType = new DocumentType(EnumDocumentType.valueOf(sellerDTO.getDocumentType()));
+            DocumentType documentType = new DocumentType(EnumDocumentType.valueOf(sellerDTO.getPersonDTO().getDocumentType()));
+            Person person = PersonMapper.personDTOToPerson(sellerDTO.getPersonDTO(), role, documentType);
             role = (!roleService.existsRoleByName(role.getNameRole())) ?
                     roleService.saveRole(role) :
                     roleService.getRoleByName(role.getNameRole()).get();
             person.setRole(role);
-            person = personService.savePerson(person);
-            person.setActive(true);
             documentType = (!documentTypeService.existsByDocumentType(documentType.getNameType())) ?
                     documentTypeService.saveDocumentType(documentType) :
                     documentTypeService.findByNameType(documentType.getNameType()).get();
+            person.setDocumentType(documentType);
+            person = personService.savePerson(person);
+            person.setActive(true);
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDTO, role, documentType);
             seller.setPerson(person);
-            seller.setDocumentType(documentType);
             if (existId != 0)
                 seller.setIdSeller(existId);
             if (!sellerService.createUser(sellerDTO, sellerService.getTokenByRequest(request)))
@@ -104,8 +104,10 @@ public class SellerController {
                 return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDetails,
                     roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get(),
-                    documentTypeService.findByNameType(EnumDocumentType.valueOf(sellerDetails.getDocumentType())).get());
-            Person person = PersonMapper.personDTOToPerson(sellerDetails.getPersonDTO(), roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get());
+                    documentTypeService.findByNameType(EnumDocumentType.valueOf(sellerDetails.getPersonDTO().getDocumentType())).get());
+            Person person = PersonMapper.personDTOToPerson(sellerDetails.getPersonDTO(),
+                    roleService.getRoleByName(EnumRole.valueOf(sellerDetails.getPersonDTO().getRole())).get(),
+                    documentTypeService.findByNameType(EnumDocumentType.valueOf(sellerDetails.getPersonDTO().getDocumentType())).get());
             seller.setPerson(personService.updatePerson(sellerDetails.getPersonDTO().getIdPerson(), person).get());
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.updateSeller(idSeller, seller).get()), HttpStatus.OK);
         } catch (Exception e){

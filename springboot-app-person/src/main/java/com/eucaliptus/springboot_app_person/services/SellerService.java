@@ -78,7 +78,6 @@ public class SellerService {
         return sellerRepository.findById(id).map(seller -> {
             seller.setUsername(sellerDetails.getUsername());
             seller.setHomeAddress(sellerDetails.getHomeAddress());
-            seller.setDocumentType(sellerDetails.getDocumentType());
             return sellerRepository.save(seller);
         });
     }

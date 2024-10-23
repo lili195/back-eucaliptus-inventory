@@ -1,9 +1,11 @@
 package com.eucaliptus.springboot_app_person.controllers;
 
 import com.eucaliptus.springboot_app_person.dtos.PersonDTO;
+import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.mappers.PersonMapper;
 import com.eucaliptus.springboot_app_person.model.Person;
+import com.eucaliptus.springboot_app_person.services.DocumentTypeService;
 import com.eucaliptus.springboot_app_person.services.PersonService;
 import com.eucaliptus.springboot_app_person.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class PersonController {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private DocumentTypeService documentTypeService;
+
     @GetMapping
     public List<Person> getAllPersons() {
         return personService.getAllPersons();
@@ -36,7 +41,9 @@ public class PersonController {
 
     @PostMapping
     public Person createPerson(@RequestBody PersonDTO personDTO) {
-        Person person = PersonMapper.personDTOToPerson(personDTO, roleService.getRoleByName(EnumRole.valueOf(personDTO.getRole())).get());
+        Person person = PersonMapper.personDTOToPerson(personDTO,
+                roleService.getRoleByName(EnumRole.valueOf(personDTO.getRole())).get(),
+                documentTypeService.findByNameType(EnumDocumentType.valueOf(personDTO.getDocumentType())).get());
         return personService.savePerson(person);
     }
 

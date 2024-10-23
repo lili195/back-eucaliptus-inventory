@@ -28,18 +28,23 @@ public class Person {
     private String phoneNumber;
 
     @ManyToOne
+    @JoinColumn(name = "id_document_type", referencedColumnName = "id_document_type")
+    private DocumentType documentType;
+
+    @ManyToOne
     @JoinColumn(name = "id_role", referencedColumnName = "id_role")
     private Role role;
 
     @Column(name = "active")
     private boolean active;
 
-    public Person(String idNumber, String firstName, String lastName, String email, String phoneNumber, Role role) {
+    public Person(String idNumber, String firstName, String lastName, String email, String phoneNumber, DocumentType documentType, Role role) {
         this.idNumber = idNumber;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.documentType = documentType;
         this.role = role;
         this.active = true;
     }
