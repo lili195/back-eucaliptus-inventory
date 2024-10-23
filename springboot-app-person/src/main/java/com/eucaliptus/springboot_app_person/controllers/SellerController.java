@@ -2,27 +2,22 @@ package com.eucaliptus.springboot_app_person.controllers;
 
 import com.eucaliptus.springboot_app_person.dtos.Message;
 import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
+import com.eucaliptus.springboot_app_person.dtos.UpdateUserDTO;
 import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.enums.EnumRole;
-import com.eucaliptus.springboot_app_person.mappers.CompanyMapper;
 import com.eucaliptus.springboot_app_person.mappers.PersonMapper;
-import com.eucaliptus.springboot_app_person.mappers.ProviderMapper;
 import com.eucaliptus.springboot_app_person.mappers.SellerMapper;
 import com.eucaliptus.springboot_app_person.model.*;
 import com.eucaliptus.springboot_app_person.services.DocumentTypeService;
 import com.eucaliptus.springboot_app_person.services.PersonService;
 import com.eucaliptus.springboot_app_person.services.RoleService;
 import com.eucaliptus.springboot_app_person.services.SellerService;
-import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,15 +35,18 @@ public class SellerController {
     private DocumentTypeService documentTypeService;
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> getAllSellers() {
         try {
             return new ResponseEntity<>(sellerService.getAllActiveSellers().stream().
                     map(SellerMapper::sellerToSellerDTO).collect(Collectors.toList()), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }    }
+        }
+    }
 
     @GetMapping("/getSellerById/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> getSellerById(@PathVariable Long id) {
         try{
             if(!sellerService.existsById(id))
@@ -60,6 +58,7 @@ public class SellerController {
     }
 
     @PostMapping("/addSeller")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> createSeller(@RequestBody SellerDTO sellerDTO,
                                                HttpServletRequest request) {
         try {
@@ -98,6 +97,7 @@ public class SellerController {
     }
 
     @PutMapping("/updateSeller/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> updateSeller(@PathVariable("id") Long idSeller, @RequestBody SellerDTO sellerDetails) {
         try {
             if(!sellerService.existsById(idSeller))
@@ -114,7 +114,28 @@ public class SellerController {
         }
     }
 
+    @PutMapping("/updateUserInfo")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO) {
+        try{
+            if (!sellerService.existsByUsername(updateUserDTO.getOldUsername()))
+                return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
+
+            Seller seller = sellerService.getSellerByUsername(updateUserDTO.getOldUsername()).get();
+            seller.setUsername(updateUserDTO.getNewUsername());
+            seller.getPerson().setEmail(updateUserDTO.getEmail());
+
+            personService.updatePerson(seller.getPerson().getIdNumber(), seller.getPerson()).get();
+            sellerService.updateSeller(seller.getIdSeller(), seller).get();
+            return new ResponseEntity<>(new Message("Vendedor actualizado"), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/deleteSeller/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteSeller(@PathVariable("id") Long idSeller, HttpServletRequest request) {
         try{
             if(!sellerService.existsById(idSeller))

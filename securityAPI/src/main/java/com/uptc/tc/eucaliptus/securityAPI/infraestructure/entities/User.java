@@ -18,7 +18,6 @@ public class User {
     @UuidGenerator
     private String id;
     @NotNull
-    @NaturalId
     @Column(unique = true)
     private String username;
     @NotNull

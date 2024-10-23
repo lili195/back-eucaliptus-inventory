@@ -44,6 +44,10 @@ public class SellerService {
         return sellerRepository.findByPerson_IdNumber(personId);
     }
 
+    public Optional<Seller> getSellerByUsername(String username) {
+        return sellerRepository.getByUsername(username);
+    }
+
     public Seller saveSeller(Seller seller) {
         return sellerRepository.save(seller);
     }
@@ -81,6 +85,10 @@ public class SellerService {
 
     public boolean existsById(Long id) {
         return sellerRepository.existsById(id);
+    }
+
+    public boolean existsByUsername(String username){
+        return sellerRepository.existsByUsername(username);
     }
 
     public boolean deleteSeller(Long id, String token) {
@@ -124,6 +132,5 @@ public class SellerService {
         if (authHeader != null && authHeader.startsWith("Bearer "))
             token = authHeader.substring(7);
         return token;
-
     }
 }

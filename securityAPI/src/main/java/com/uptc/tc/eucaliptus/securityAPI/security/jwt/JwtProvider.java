@@ -21,9 +21,10 @@ public class JwtProvider {
     private String timeExpiration;
 
     // Generar token de acceso
-    public String generateToken(String username, Role role) {
+    public String generateToken(String username, Role role, String email) {
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("role", role.getRoleName().name());
+        claims.put("email", email);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)

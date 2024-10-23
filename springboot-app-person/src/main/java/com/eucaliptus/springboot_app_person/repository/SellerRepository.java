@@ -12,7 +12,11 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     boolean existsByIdSeller(Long id);
 
+    boolean existsByUsername(String Username);
+
     List<Seller> findByActiveTrue();
 
     Optional<Seller> findByPerson_IdNumber(String personId);
+
+    Optional<Seller> getByUsername(String username);
 }
