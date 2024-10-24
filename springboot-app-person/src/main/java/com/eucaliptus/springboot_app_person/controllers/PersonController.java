@@ -12,6 +12,7 @@ import com.eucaliptus.springboot_app_person.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class PersonController {
     }
 
     @GetMapping("/getAdmin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> getAdmin(){
         try {
             Optional<Person> opPerson = personService.getAdmin();

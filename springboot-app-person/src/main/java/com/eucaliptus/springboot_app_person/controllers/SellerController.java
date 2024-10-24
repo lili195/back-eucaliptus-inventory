@@ -52,8 +52,20 @@ public class SellerController {
     public ResponseEntity<Object> getSellerById(@PathVariable Long id) {
         try{
             if(!sellerService.existsById(id))
-                return new ResponseEntity<>(new Message("Proveedor no encontrado"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new Message("Vendedor no encontrado"), HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.getSellerById(id).get()), HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("getSellerByUsername/{username}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> getSellerByUsername(@PathVariable String username) {
+        try{
+            if(!sellerService.existsByUsername(username))
+                return new ResponseEntity<>(new Message("Vendedor no encontrado"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.getSellerByUsername(username).get()), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
