@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_person.services;
 
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.model.Person;
 import com.eucaliptus.springboot_app_person.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,10 @@ public class PersonService {
 
     public Optional<Person> getPersonById(String idNumber) {
         return personRepository.findByIdNumber(idNumber);
+    }
+
+    public Optional<Person> getAdmin(){
+        return personRepository.findByRole_nameRole(EnumRole.ROLE_ADMIN);
     }
 
     public Person savePerson(Person person) {

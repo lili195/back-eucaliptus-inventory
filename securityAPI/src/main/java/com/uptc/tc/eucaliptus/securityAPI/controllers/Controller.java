@@ -117,10 +117,6 @@ public class Controller {
                 String token = headerToken.substring(7);
                 if (!updateUserDTO.getOldUsername().equals(jwtProvider.getUsernameFromToken(token)))
                     return new ResponseEntity<>(new Message("No tienes permiso"), HttpStatus.UNAUTHORIZED);
-                String role = jwtProvider.getAllClaims(token).get("role", String.class);
-                if (role.equals(RoleList.ROLE_SELLER.name()))
-                    if (!userService.updateSellerInfo(updateUserDTO, token))
-                        return new ResponseEntity<>(new Message("No se puede actualizar el usuario"), HttpStatus.BAD_REQUEST);
                 userService.updateUser(updateUserDTO);
                 return new ResponseEntity<>(new Message("Usuario actualizado"), HttpStatus.OK);
             }

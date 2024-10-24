@@ -8,10 +8,8 @@ import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.mappers.PersonMapper;
 import com.eucaliptus.springboot_app_person.mappers.SellerMapper;
 import com.eucaliptus.springboot_app_person.model.*;
-import com.eucaliptus.springboot_app_person.services.DocumentTypeService;
-import com.eucaliptus.springboot_app_person.services.PersonService;
-import com.eucaliptus.springboot_app_person.services.RoleService;
-import com.eucaliptus.springboot_app_person.services.SellerService;
+import com.eucaliptus.springboot_app_person.security.JwtTokenUtil;
+import com.eucaliptus.springboot_app_person.services.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +30,11 @@ public class SellerController {
     @Autowired
     private PersonService personService;
     @Autowired
+    private UserService userService;
+    @Autowired
     private DocumentTypeService documentTypeService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -87,7 +89,7 @@ public class SellerController {
             seller.setPerson(person);
             if (existId != 0)
                 seller.setIdSeller(existId);
-            if (!sellerService.createUser(sellerDTO, sellerService.getTokenByRequest(request)))
+            if (!userService.createUser(sellerDTO, userService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.saveSeller(seller)), HttpStatus.OK);
         } catch (Exception e){
@@ -118,18 +120,33 @@ public class SellerController {
 
     @PutMapping("/updateUserInfo")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO) {
+    public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO, HttpServletRequest request) {
         try{
-            if (!sellerService.existsByUsername(updateUserDTO.getOldUsername()))
+            String role = jwtTokenUtil.extractAllClaims(userService.getTokenByRequest(request)).get("role", String.class);
+            if (!sellerService.existsByUsername(updateUserDTO.getOldUsername()) && !role.equals(EnumRole.ROLE_ADMIN.name()))
                 return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
+            if (sellerService.existsByUsername(updateUserDTO.getNewUsername()) && !updateUserDTO.getNewUsername().equals(updateUserDTO.getOldUsername()))
+                return new ResponseEntity<>(new Message("El username ya existe"), HttpStatus.CONFLICT);
+            if (userService.updateUserInfo(updateUserDTO, userService.getTokenByRequest(request))) {
+                if (role.equals(EnumRole.ROLE_ADMIN.name())) {
+                    Person person = personService.getAdmin().get();
+                    person.setEmail(updateUserDTO.getEmail());
+                    person.setFirstName(updateUserDTO.getFirstName());
+                    person.setLastName(updateUserDTO.getLastName());
+                    personService.updatePerson(person.getIdNumber(), person);
+                } else {
+                    Seller seller = sellerService.getSellerByUsername(updateUserDTO.getOldUsername()).get();
+                    seller.setUsername(updateUserDTO.getNewUsername());
+                    seller.getPerson().setEmail(updateUserDTO.getEmail());
+                    seller.getPerson().setFirstName(updateUserDTO.getFirstName());
+                    seller.getPerson().setLastName(updateUserDTO.getLastName());
 
-            Seller seller = sellerService.getSellerByUsername(updateUserDTO.getOldUsername()).get();
-            seller.setUsername(updateUserDTO.getNewUsername());
-            seller.getPerson().setEmail(updateUserDTO.getEmail());
-
-            personService.updatePerson(seller.getPerson().getIdNumber(), seller.getPerson()).get();
-            sellerService.updateSeller(seller.getIdSeller(), seller).get();
-            return new ResponseEntity<>(new Message("Vendedor actualizado"), HttpStatus.OK);
+                    personService.updatePerson(seller.getPerson().getIdNumber(), seller.getPerson()).get();
+                    sellerService.updateSeller(seller.getIdSeller(), seller).get();
+                }
+                return new ResponseEntity<>(new Message("Cuenta actualizada"), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new Message("Error al modificar la cuenta"), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -142,7 +159,8 @@ public class SellerController {
         try{
             if(!sellerService.existsById(idSeller))
                 return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
-            if(sellerService.deleteSeller(idSeller, sellerService.getTokenByRequest(request)))
+            if(sellerService.deleteSeller(idSeller, userService.getTokenByRequest(request))
+            && userService.deleteUserAccount(sellerService.getSellerById(idSeller).get().getUsername(), userService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Vendedor eliminado"), HttpStatus.OK);
             return new ResponseEntity<>(new Message("Error con la bd"), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {

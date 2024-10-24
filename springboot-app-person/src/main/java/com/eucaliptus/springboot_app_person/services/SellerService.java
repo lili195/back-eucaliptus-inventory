@@ -25,9 +25,6 @@ public class SellerService {
     @Autowired
     private SellerRepository sellerRepository;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
     public List<Seller> getAllSellers() {
         return sellerRepository.findAll();
     }
@@ -52,28 +49,6 @@ public class SellerService {
         return sellerRepository.save(seller);
     }
 
-    public boolean createUser(SellerDTO seller, String token) {
-        try{
-            UserDTO userDTO = new UserDTO(
-                    seller.getUsername(),
-                    seller.getPersonDTO().getEmail(),
-                    seller.getPassword(),
-                    seller.getPersonDTO().getRole());
-            HttpEntity<UserDTO> entity = new HttpEntity<>(userDTO, getHeader(token));
-            ResponseEntity<UserDTO> response = restTemplate.exchange(
-                    ServicesUri.AUTH_SERVICE + "/auth/addSeller",
-                    HttpMethod.POST,
-                    entity,
-                    UserDTO.class
-            );
-            System.out.println(response.getStatusCode());
-            System.out.println(HttpStatus.CREATED);
-            return response.getStatusCode() == HttpStatus.CREATED;
-        } catch (Exception e){
-            return false;
-        }
-    }
-
     public Optional<Seller> updateSeller(Long id, Seller sellerDetails) {
         return sellerRepository.findById(id).map(seller -> {
             seller.setUsername(sellerDetails.getUsername());
@@ -95,41 +70,9 @@ public class SellerService {
             seller.setActive(false);
             seller.getPerson().setActive(false);
             sellerRepository.save(seller);
-            return deleteUserAccount(seller.getUsername(), token);
+            return true;
         }).orElse(false);
     }
 
-    public boolean deleteUserAccount(String username, String token) {
-        try{
-            String url = UriComponentsBuilder
-                    .fromHttpUrl(ServicesUri.AUTH_SERVICE + "/auth/deleteSeller")
-                    .queryParam("username", username)
-                    .toUriString();
-            HttpEntity<Message> entity = new HttpEntity<>(getHeader(token));
-            ResponseEntity<String> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.DELETE,
-                    entity,
-                    String.class
-            );
-            return response.getStatusCode() == HttpStatus.OK;
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
 
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
-    }
-
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
 }

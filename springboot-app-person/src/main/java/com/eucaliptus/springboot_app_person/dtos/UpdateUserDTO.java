@@ -9,6 +9,8 @@ import lombok.*;
 @Getter
 @Setter
 public class UpdateUserDTO {
+    private String firstName;
+    private String lastName;
     private String oldUsername;
     private String newUsername;
     private String email;
