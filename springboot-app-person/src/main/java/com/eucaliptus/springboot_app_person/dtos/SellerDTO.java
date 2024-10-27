@@ -10,8 +10,6 @@ import lombok.*;
 public class SellerDTO {
     private String idSeller;
     private PersonDTO personDTO;
-    private String documentType;
-    private String documentNumber;
     private String username;
     private String password;
     private String homeAddress;

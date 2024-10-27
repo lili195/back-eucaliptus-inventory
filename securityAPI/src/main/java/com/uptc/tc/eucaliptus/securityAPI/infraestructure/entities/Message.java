@@ -5,10 +5,10 @@ import lombok.*;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 public class Message {
     @NotNull
-    private String infoMessage;
+    private String message;
+
+    public Message(){
+    }
 }

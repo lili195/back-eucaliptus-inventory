@@ -19,8 +19,16 @@ public class ProviderService {
         return providerRepository.findAll();
     }
 
+    public List<Provider> getAllActiveProviders() {
+        return providerRepository.findByActiveTrue();
+    }
+
     public Optional<Provider> getProviderById(Long id) {
         return providerRepository.findById(id);
+    }
+
+    public Optional<Provider> getProviderByPersonId(String idPerson) {
+        return providerRepository.findByPerson_IdNumber(idPerson);
     }
 
     public Provider saveProvider(Provider provider) {
@@ -41,8 +49,12 @@ public class ProviderService {
 
     public boolean deleteProvider(Long id) {
         return providerRepository.findById(id).map(provider -> {
-            providerRepository.delete(provider);
+            provider.setActive(false);
+            provider.getPerson().setActive(false);
+            providerRepository.save(provider);
             return true;
         }).orElse(false);
     }
+
+
 }

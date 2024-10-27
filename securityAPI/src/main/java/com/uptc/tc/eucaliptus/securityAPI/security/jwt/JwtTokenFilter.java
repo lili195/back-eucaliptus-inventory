@@ -1,6 +1,5 @@
 package com.uptc.tc.eucaliptus.securityAPI.security.jwt;
 
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.TokenService;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,8 +20,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private JwtProvider jwtProvider;
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
-    @Autowired
-    private TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -31,7 +28,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             String tokenHeader = request.getHeader("Authorization");
             if(tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
                 String token = tokenHeader.substring(7);
-                if (jwtProvider.isTokenValid(token) && tokenService.existsToken(token)) {
+                if (jwtProvider.isTokenValid(token)) {
                     String username = jwtProvider.getUsernameFromToken(token);
                     UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null,

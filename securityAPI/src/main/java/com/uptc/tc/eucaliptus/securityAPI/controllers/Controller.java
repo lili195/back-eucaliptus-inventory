@@ -2,16 +2,16 @@ package com.uptc.tc.eucaliptus.securityAPI.controllers;
 
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.LoginUser;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.TokenDTO;
+import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.UpdateUserDTO;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.UserDTO;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Message;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Role;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.TokenEntity;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.User;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.enums.RoleList;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.RoleService;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.TokenService;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.UserService;
 import com.uptc.tc.eucaliptus.securityAPI.security.jwt.JwtProvider;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -31,16 +31,14 @@ public class Controller {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public Controller(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager, TokenService tokenService) {
+    public Controller(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.roleService = roleService;
-        this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
         this.authenticationManager = authenticationManager;
@@ -57,9 +55,11 @@ public class Controller {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             authenticationManager.authenticate(authenticationToken);
 
-            String token = jwtProvider.generateToken(loginUser.getUsername(), userService.getByUserName(username).get().getRole());
-            tokenService.save(new TokenEntity(token, userService.getByUserName(username).get()));
-            TokenDTO tokenDTO = new TokenDTO(token, jwtProvider.getAllClaims(token).get("role", String.class), username);
+            User user = userService.getByUserName(username).get();
+            String token = jwtProvider.generateToken(loginUser.getUsername(), user.getRole(), user.getEmail());
+            //tokenService.save(new TokenEntity(token, userService.getByUserName(username).get()));
+            Claims claims = jwtProvider.getAllClaims(token);
+            TokenDTO tokenDTO = new TokenDTO(token, claims.get("role", String.class), username, claims.get("email", String.class));
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Message("Credenciales invalidas"), HttpStatus.BAD_REQUEST);
@@ -104,11 +104,37 @@ public class Controller {
         }
     }
 
+    @PutMapping("/updateUserInfo")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO, HttpServletRequest request){
+        try{
+            if (!userService.existByUserName(updateUserDTO.getOldUsername()))
+                return new ResponseEntity<>(new Message("El usuario no existe"), HttpStatus.BAD_REQUEST);
+            if (userService.existByUserName(updateUserDTO.getNewUsername()) && !updateUserDTO.getNewUsername().equals(updateUserDTO.getOldUsername()))
+                return new ResponseEntity<>(new Message("El username ya existe"), HttpStatus.CONFLICT);
+            String headerToken = request.getHeader("Authorization");
+            if(headerToken != null && headerToken.startsWith("Bearer ")) {
+                String token = headerToken.substring(7);
+                if (!updateUserDTO.getOldUsername().equals(jwtProvider.getUsernameFromToken(token)))
+                    return new ResponseEntity<>(new Message("No tienes permiso"), HttpStatus.UNAUTHORIZED);
+                userService.updateUser(updateUserDTO);
+                return new ResponseEntity<>(new Message("Usuario actualizado"), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new Message("No se puede actualizar el usuario"), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
     @DeleteMapping("/deleteSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteSeller(@RequestParam String username ){
+        System.out.println(username);
         if(userService.existByUserName(username)){
-            tokenService.deleteByUserId(userService.getByUserName(username).get().getId());
+            //tokenService.deleteByUserId(userService.getByUserName(username).get().getId());
             userService.delete(username);
             return new ResponseEntity<>(new Message("Usuario eliminado existosamente"), HttpStatus.OK);
         } else {
@@ -118,14 +144,8 @@ public class Controller {
 
     @GetMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletResponse response, HttpServletRequest request){
-        tokenService.delete(request.getHeader("Authorization").substring(7));
+        //tokenService.delete(request.getHeader("Authorization").substring(7));
         return new ResponseEntity<>(new Message("Se ha cerrado la sesion"), HttpStatus.OK);
-    }
-
-    @PostMapping("/validate")
-    public ResponseEntity<Object> validate(@Valid @RequestBody String token) {
-        boolean isValid = tokenService.existsToken(token) && jwtProvider.isTokenValid(token);
-        return new ResponseEntity<>(isValid, HttpStatus.OK);
     }
 
 }

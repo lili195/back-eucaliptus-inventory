@@ -1,5 +1,6 @@
 package com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -8,13 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class TokenDTO {
+public class UpdateUserDTO {
     @NotNull
-    private String token;
+    private String oldUsername;
     @NotNull
-    private String role;
-    @NotNull
-    private String username;
+    private String newUsername;
+    @Email
     @NotNull
     private String email;
 }
