@@ -47,6 +47,7 @@ public class UnitService {
     }
 
     public boolean existsById(Long id) {
-        return false;
+        return unitRepository.existsByIdUnit(id);
     }
+
 }

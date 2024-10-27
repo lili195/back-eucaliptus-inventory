@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "products") // Convención de pluralización en la tabla
+@Table(name = "products")
 public class Product {
 
     @Id
@@ -23,11 +23,13 @@ public class Product {
     @Column(name = "brand")
     private String brand;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    private String category;
+    private EnumCategory category;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "use")
-    private String use;
+    private EnumUse use;
 
     @Column(name = "id_provider")
     private Long idProvider;

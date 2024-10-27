@@ -11,8 +11,8 @@ public class ProductDTO {
     private Long idProduct;
     private String productName;
     private String brand;
-    private String category;
-    private String use;
+    private EnumCategory category;
+    private EnumUse use;
     private Long idProvider;
     private String description;
     private Long idUnit;

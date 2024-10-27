@@ -63,22 +63,22 @@ public class UnitController {
     @PutMapping("/updateUnit/{id}")
     public ResponseEntity<UnitDTO> updateUnit(@PathVariable Long id, @RequestBody UnitDTO unitDTO) {
         try {
-            if (!unitService.existsById(id)) {
+            if (!unitService.existsByIdUnit(id)) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
             Unit unit = UnitMapper.unitDTOToUnit(unitDTO);
-            unit.setIdUnit(id); // Asigna el ID
-            Optional<Unit> updatedUnit = unitService.updateUnit(id, unit); // Devuelve un Optional<Unit>
+            unit.setIdUnit(id);
+            Optional<Unit> updatedUnit = unitService.updateUnit(id, unit);
 
             if (updatedUnit.isPresent()) {
-                // Extrae el Unit del Optional y luego pásalo al mapper
                 UnitDTO updatedUnitDTO = UnitMapper.unitToUnitDTO(updatedUnit.get());
                 return new ResponseEntity<>(updatedUnitDTO, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
