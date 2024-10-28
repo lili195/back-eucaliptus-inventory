@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface UnitRepository extends JpaRepository<Unit, Long> {
 
-    boolean existsByIdUnit(Long idUnit);
+    boolean existsByIdUnit(int idUnit);
 
-    Optional<Unit> findByIdUnit(Long idUnit);
+    Optional<Unit> findByIdUnit(int idUnit);
 }

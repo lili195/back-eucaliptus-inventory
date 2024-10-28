@@ -3,8 +3,6 @@ package com.eucaliptus.springboot_app_products.mappers;
 import com.eucaliptus.springboot_app_products.dto.UnitDTO;
 import com.eucaliptus.springboot_app_products.model.Unit;
 
-import java.util.Optional;
-
 public class UnitMapper {
 
     public static Unit unitDTOToUnit(UnitDTO unitDTO) {

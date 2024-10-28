@@ -15,7 +15,7 @@ public class Unit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_unit")
-    private Long idUnit;
+    private int idUnit;
 
     @Column(name = "unit_name", nullable = false)
     private String unitName;

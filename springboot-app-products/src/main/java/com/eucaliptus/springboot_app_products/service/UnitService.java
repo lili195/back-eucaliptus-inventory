@@ -19,8 +19,8 @@ public class UnitService {
         return unitRepository.findAll();
     }
 
-    public Optional<Unit> getUnitById(Long idUnit) {
-        return unitRepository.findById(idUnit);
+    public Optional<Unit> getUnitById(int idUnit) {
+        return unitRepository.findById((long) idUnit);
     }
 
     public Unit saveUnit(Unit unit) {
@@ -35,18 +35,18 @@ public class UnitService {
         });
     }
 
-    public boolean existsByIdUnit(Long idUnit) {
-        return unitRepository.existsById(idUnit);
+    public boolean existsByIdUnit(int idUnit) {
+        return unitRepository.existsById((long) idUnit);
     }
 
-    public boolean deleteUnit(Long idUnit) {
-        return unitRepository.findById(idUnit).map(unit -> {
+    public boolean deleteUnit(int idUnit) {
+        return unitRepository.findById((long) idUnit).map(unit -> {
             unitRepository.delete(unit);
             return true;
         }).orElse(false);
     }
 
-    public boolean existsById(Long id) {
+    public boolean existsById(int id) {
         return unitRepository.existsByIdUnit(id);
     }
 

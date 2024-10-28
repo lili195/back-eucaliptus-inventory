@@ -34,7 +34,7 @@ public class UnitController {
 
 
     @GetMapping("/getUnitById/{id}")
-    public ResponseEntity<UnitDTO> getUnitById(@PathVariable Long id) {
+    public ResponseEntity<UnitDTO> getUnitById(@PathVariable int id) {
         try {
             Optional<Unit> optionalUnit = unitService.getUnitById(id); // Cambia a Optional
             if (optionalUnit.isPresent()) {
@@ -61,7 +61,7 @@ public class UnitController {
     }
 
     @PutMapping("/updateUnit/{id}")
-    public ResponseEntity<UnitDTO> updateUnit(@PathVariable Long id, @RequestBody UnitDTO unitDTO) {
+    public ResponseEntity<UnitDTO> updateUnit(@PathVariable int id, @RequestBody UnitDTO unitDTO) {
         try {
             if (!unitService.existsByIdUnit(id)) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -69,7 +69,7 @@ public class UnitController {
 
             Unit unit = UnitMapper.unitDTOToUnit(unitDTO);
             unit.setIdUnit(id);
-            Optional<Unit> updatedUnit = unitService.updateUnit(id, unit);
+            Optional<Unit> updatedUnit = unitService.updateUnit((long) id, unit);
 
             if (updatedUnit.isPresent()) {
                 UnitDTO updatedUnitDTO = UnitMapper.unitToUnitDTO(updatedUnit.get());
@@ -85,7 +85,7 @@ public class UnitController {
 
 
     @DeleteMapping("/deleteUnit/{id}")
-    public ResponseEntity<Void> deleteUnit(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUnit(@PathVariable int id) {
         return unitService.deleteUnit(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 }

@@ -3,26 +3,23 @@ package com.eucaliptus.springboot_app_products.dto;
 import com.eucaliptus.springboot_app_products.enums.EnumCategory;
 import com.eucaliptus.springboot_app_products.enums.EnumUse;
 import com.eucaliptus.springboot_app_products.model.Unit;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-
-public class ProductDTO {
-    private Long idProduct;
+public class UpdateProductDTO {
     private String productName;
-    private String brand;
-    private EnumCategory category;
-    private EnumUse use;
-    private Long idProvider;
+    private String oldProductName;
     private String description;
+    private String oldDescription;
     private Unit idUnit;
+    private int oldIdUnit;
     private Integer minimumProductAmount;
+    private Integer oldMinimumProductAmount;
     private Integer maximumProductAmount;
+    private Integer oldMaximumProductAmount;
 
-    public ProductDTO(String productName, String brand, EnumCategory category, EnumUse use, Long idProvider, String description, Unit idUnit, Integer minimumProductAmount, Integer maximumProductAmount) {
-    }
 }

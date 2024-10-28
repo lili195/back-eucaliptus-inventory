@@ -1,5 +1,7 @@
 package com.eucaliptus.springboot_app_products.model;
 
+import com.eucaliptus.springboot_app_products.enums.EnumCategory;
+import com.eucaliptus.springboot_app_products.enums.EnumUse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +20,7 @@ public class Product {
     private Long idProduct;
 
     @Column(name = "product_name", nullable = false)
-    private String productName;
+    private String name;
 
     @Column(name = "brand")
     private String brand;
@@ -47,15 +49,30 @@ public class Product {
     @Column(name = "maximum_product_amount")
     private Integer maximumProductAmount;
 
+    @Column(name = "isActive")
+    private boolean active;
+
     public Product(String productName, String brand, String category, String use, Long idProvider, String description, Unit unit, Integer minimumProductAmount, Integer maximumProductAmount) {
-        this.productName = productName;
+        this.name = productName;
         this.brand = brand;
-        this.category = category;
-        this.use = use;
+        this.category = EnumCategory.valueOf(category);
+        this.use = EnumUse.valueOf(use);
         this.idProvider = idProvider;
         this.description = description;
         this.unit = unit;
         this.minimumProductAmount = minimumProductAmount;
         this.maximumProductAmount = maximumProductAmount;
+    }
+
+    public boolean isActive() {
+        return active; // Retorna el estado activo
+    }
+
+    public void setIdUnit(Unit idUnit) {
+        this.unit = idUnit;
+    }
+
+    public Unit getIdUnit() {
+        return unit;
     }
 }
