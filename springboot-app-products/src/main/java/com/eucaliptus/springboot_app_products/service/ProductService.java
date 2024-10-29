@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +37,7 @@ public class ProductService {
                     product.getMaximumProductAmount());
             HttpEntity<ProductDTO> entity = new HttpEntity<>(productDTO, getHeader(token));
             ResponseEntity<ProductDTO> response = restTemplate.exchange(
-                    ServicesUri.AUTH_SERVICE + "/auth/addProduct",
+                    ServicesUri.AUTH_SERVICE + "/product/addProduct",
                     HttpMethod.POST,
                     entity,
                     ProductDTO.class
@@ -55,7 +54,7 @@ public class ProductService {
         try{
             HttpEntity<UpdateProductDTO> entity = new HttpEntity<>(productDetails, getHeader(token));
             ResponseEntity<String> response = restTemplate.exchange(
-                    ServicesUri.AUTH_SERVICE + "/auth/updateProduct",
+                    ServicesUri.AUTH_SERVICE + "/product/updateProduct",
                     HttpMethod.PUT,
                     entity,
                     String.class
@@ -110,7 +109,7 @@ public class ProductService {
     }
 
     public Optional<Product> getProductByName(String name) {
-        return productRepository.findByNameProduct(name);
+        return productRepository.findByName(name);
     }
 
     public boolean existsByIdProduct(Long id) {

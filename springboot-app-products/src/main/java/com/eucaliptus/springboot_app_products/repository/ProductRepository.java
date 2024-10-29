@@ -14,11 +14,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdProduct(Long idProduct);
 
-    List<Product> findByName(String name);
+ //   List<Product> findByName(String name);
 
     List<Product> findByActiveTrue();
 
     boolean existsByName(String productName);
 
-    Optional<Product> findByNameProduct(String name);
+    Optional<Product> findByName(String name);
 }
