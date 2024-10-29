@@ -83,15 +83,8 @@ public class ProductController {
         try {
             if (!productService.existsProviderId(productDTO.getIdProvider(), productService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Proveedor no existente"), HttpStatus.BAD_REQUEST);
-            String existId = "";
-            if (productService.existsByIdProduct(productDTO.getIdProduct())) {
-                Optional<Product> opProduct = productService.getProductById(productDTO.getIdProduct());
-                if (opProduct.isPresent() && opProduct.get().isActive())
-                    return new ResponseEntity<>(new Message("Id de producto ya existente"), HttpStatus.BAD_REQUEST);
-
-                if (opProduct.isPresent())
-                    existId = opProduct.get().getIdProduct();
-            }
+            if (productService.existsByIdProduct(productDTO.getIdProduct()))
+                return new ResponseEntity<>(new Message("Id de producto ya existente"), HttpStatus.BAD_REQUEST);
             UnitDTO unitDTO = productDTO.getUnitDTO();
             Optional<Unit> opUnit = unitService.getUnitByNameAndDescription(unitDTO.getUnitName(), unitDTO.getDescription());
             Unit unit = (opUnit.isPresent()) ?
@@ -99,9 +92,6 @@ public class ProductController {
                     unitService.saveUnit(new Unit(productDTO.getUnitDTO().getUnitName(), productDTO.getUnitDTO().getDescription()));
 
             Product product = ProductMapper.productDTOToProduct(productDTO, unit);
-            if (!existId.isEmpty())
-                product.setIdProduct(existId);
-
             product = productService.saveProduct(product);
             Stock stock = stockService.saveStock(new Stock(product, 0));
             return new ResponseEntity<>(ProductMapper.productToProductDTO(product), HttpStatus.OK);

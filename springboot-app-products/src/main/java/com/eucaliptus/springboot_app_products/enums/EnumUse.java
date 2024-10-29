@@ -1,6 +1,11 @@
 package com.eucaliptus.springboot_app_products.enums;
 
 public enum EnumUse {
-    VITAMINA,
-    PROTEINA
+    SUPLEMENTOS,
+    HOMEOPATICOS,
+    FITOTERAPEUTICOS,
+    ESPECIAS,
+    ESOTERICOS,
+    CUIDADO_PERSONAL,
+    OTROS
 }
