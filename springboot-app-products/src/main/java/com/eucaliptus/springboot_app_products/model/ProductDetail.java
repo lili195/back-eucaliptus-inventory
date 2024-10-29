@@ -33,10 +33,15 @@ public class ProductDetail {
     @Column(name = "due_date", nullable = false)
     private Date dueDate;
 
-    public ProductDetail(Integer quantity, Double unitPrice, Date batch, Date dueDate) {
+    @ManyToOne
+    @JoinColumn(name = "id_stock", referencedColumnName = "id_stock")
+    private Stock stock;
+
+    public ProductDetail(Integer quantity, Double unitPrice, Date batch, Date dueDate, Stock stock) {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.batch = batch;
         this.dueDate = dueDate;
+        this.stock = stock;
     }
 }

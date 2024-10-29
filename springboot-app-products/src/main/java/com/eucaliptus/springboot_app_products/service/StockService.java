@@ -31,7 +31,7 @@ public class StockService {
 
         if (existingStock.isPresent()) {
             Stock stockToUpdate = existingStock.get();
-            stockToUpdate.setQuantity(stockDetails.getQuantity()); // Actualiza los campos que necesites
+            stockToUpdate.setQuantityAvailable(stockDetails.getQuantityAvailable()); // Actualiza los campos que necesites
             stockToUpdate.setProduct(stockDetails.getProduct());   // Otros campos...
 
             return stockRepository.save(stockToUpdate);

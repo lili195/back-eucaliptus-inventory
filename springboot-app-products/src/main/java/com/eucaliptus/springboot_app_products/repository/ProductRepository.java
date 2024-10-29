@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, String> {
 
-    boolean existsByIdProduct(Long idProduct);
+    boolean existsByIdProduct(String idProduct);
 
-    Optional<Product> findByIdProduct(Long idProduct);
-
- //   List<Product> findByName(String name);
+    Optional<Product> findByIdProduct(String idProduct);
 
     List<Product> findByActiveTrue();
+
+    List<Product> findByIdProvider(Long idProvider);
 
     boolean existsByName(String productName);
 

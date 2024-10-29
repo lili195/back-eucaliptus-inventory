@@ -15,9 +15,8 @@ import lombok.Setter;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_product")
-    private Long idProduct;
+    private String idProduct;
 
     @Column(name = "product_name", nullable = false)
     private String name;
@@ -52,7 +51,8 @@ public class Product {
     @Column(name = "isActive")
     private boolean active;
 
-    public Product(String productName, String brand, String category, String use, Long idProvider, String description, Unit unit, Integer minimumProductAmount, Integer maximumProductAmount) {
+    public Product(String idProduct, String productName, String brand, String category, String use, Long idProvider, String description, Unit unit, Integer minimumProductAmount, Integer maximumProductAmount) {
+        this.idProduct = idProduct;
         this.name = productName;
         this.brand = brand;
         this.category = EnumCategory.valueOf(category);
@@ -62,17 +62,7 @@ public class Product {
         this.unit = unit;
         this.minimumProductAmount = minimumProductAmount;
         this.maximumProductAmount = maximumProductAmount;
+        this.active = true;
     }
 
-    public boolean isActive() {
-        return active; // Retorna el estado activo
-    }
-
-    public void setIdUnit(Unit idUnit) {
-        this.unit = idUnit;
-    }
-
-    public Unit getIdUnit() {
-        return unit;
-    }
 }

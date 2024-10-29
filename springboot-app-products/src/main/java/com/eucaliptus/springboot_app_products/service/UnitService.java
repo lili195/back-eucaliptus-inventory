@@ -23,6 +23,14 @@ public class UnitService {
         return unitRepository.findById((long) idUnit);
     }
 
+    public Optional<Unit> getUnitByName(String name) {
+        return unitRepository.findByUnitName(name);
+    }
+
+    public Optional<Unit> getUnitByNameAndDescription(String name, String description) {
+        return unitRepository.findByUnitNameAndDescription(name, description);
+    }
+
     public Unit saveUnit(Unit unit) {
         return unitRepository.save(unit);
     }

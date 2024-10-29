@@ -11,6 +11,7 @@ import java.util.Date;
 @Setter
 public class ProductDetailDTO {
     private Long idDetProduct;
+    private ProductDTO productDTO;
     private Integer quantity;
     private Double unitPrice;
     private Date batch;

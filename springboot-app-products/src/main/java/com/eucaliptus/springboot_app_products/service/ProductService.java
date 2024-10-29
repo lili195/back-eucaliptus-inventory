@@ -1,8 +1,6 @@
 package com.eucaliptus.springboot_app_products.service;
 
-import com.eucaliptus.springboot_app_products.dto.Message;
-import com.eucaliptus.springboot_app_products.dto.UpdateProductDTO;
-import com.eucaliptus.springboot_app_products.dto.ProductDTO;
+import com.eucaliptus.springboot_app_person.dtos.ProviderDTO;
 import com.eucaliptus.springboot_app_products.utlities.ServicesUri;
 import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.repository.ProductRepository;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,69 +18,74 @@ public class ProductService {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
     private ProductRepository productRepository;
 
-    public boolean createProduct(ProductDTO product, String token) {
-        try{
-            ProductDTO productDTO = new ProductDTO(
-                    product.getProductName(),
-                    product.getBrand(),
-                    product.getCategory(),
-                    product.getUse(),
-                    product.getIdProvider(),
-                    product.getDescription(),
-                    product.getIdUnit(),
-                    product.getMinimumProductAmount(),
-                    product.getMaximumProductAmount());
-            HttpEntity<ProductDTO> entity = new HttpEntity<>(productDTO, getHeader(token));
-            ResponseEntity<ProductDTO> response = restTemplate.exchange(
-                    ServicesUri.AUTH_SERVICE + "/product/addProduct",
-                    HttpMethod.POST,
-                    entity,
-                    ProductDTO.class
-            );
-            System.out.println(response.getStatusCode());
-            System.out.println(HttpStatus.CREATED);
-            return response.getStatusCode() == HttpStatus.CREATED;
-        } catch (Exception e){
-            return false;
-        }
+    public List<Product> getAllActiveProducts() {
+        return productRepository.findByActiveTrue();
     }
 
-    public boolean updateProduct(UpdateProductDTO productDetails, String token) {
+    public List<Product> getProductsByIdProvider(Long idProvider) {
+        return productRepository.findByIdProvider(idProvider);
+    }
+
+    public Optional<Product> getProductById(String id) {
+        return productRepository.findByIdProduct(id);
+    }
+
+    public Optional<Product> getProductByName(String name) {
+        return productRepository.findByName(name);
+    }
+
+    public boolean existsByIdProduct(String id) {
+        return  productRepository.existsByIdProduct(id);
+    }
+
+    public boolean existsByNameProduct(String productName) {
+        return productRepository.existsByName(productName);
+    }
+
+    public boolean existsProviderId(Long providerId, String token) {
         try{
-            HttpEntity<UpdateProductDTO> entity = new HttpEntity<>(productDetails, getHeader(token));
-            ResponseEntity<String> response = restTemplate.exchange(
-                    ServicesUri.AUTH_SERVICE + "/product/updateProduct",
-                    HttpMethod.PUT,
+            HttpEntity<String> entity = new HttpEntity<>(getHeader(token));
+            System.out.println(ServicesUri.PERSON_SERVICE + "/person/providers/getProviderById/" + providerId);
+            ResponseEntity<ProviderDTO> response = restTemplate.exchange(
+                ServicesUri.PERSON_SERVICE + "/person/providers/getProviderById/" + providerId,
+                    HttpMethod.GET,
                     entity,
-                    String.class
+                    ProviderDTO.class
             );
-            return response.getStatusCode() == HttpStatus.OK;
+            return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e){
             e.printStackTrace();
             return false;
         }
     }
 
-    public boolean deleteProduct(String productName, String token) {
-        try{
-            String url = UriComponentsBuilder
-                    .fromHttpUrl(ServicesUri.AUTH_SERVICE + "/auth/deleteProduct")
-                    .queryParam("productName", productName)
-                    .toUriString();
-            HttpEntity<Message> entity = new HttpEntity<>(getHeader(token));
-            ResponseEntity<String> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.DELETE,
-                    entity,
-                    String.class
-            );
-            return response.getStatusCode() == HttpStatus.OK;
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    public Optional<Product> updateProduct(String id, Product productDetails) {
+        return productRepository.findByIdProduct(id).map(product -> {
+            product.setName(productDetails.getName());
+            product.setBrand(productDetails.getBrand());
+            product.setCategory(productDetails.getCategory());
+            product.setUse(productDetails.getUse());
+            product.setDescription(productDetails.getDescription());
+            product.setUnit(productDetails.getUnit());
+            product.setMinimumProductAmount(productDetails.getMinimumProductAmount());
+            product.setMaximumProductAmount(productDetails.getMaximumProductAmount());
+            return productRepository.save(product);
+        });
+    }
+
+    public boolean deleteProduct(String id) {
+        return productRepository.findByIdProduct(id).map(product -> {
+           product.setActive(false);
+           productRepository.save(product);
+           return true;
+        }).orElse(false);
     }
 
     public String getTokenByRequest(HttpServletRequest request) {
@@ -98,25 +100,5 @@ public class ProductService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         return headers;
-    }
-
-    public List<Product> getAllActiveProducts() {
-        return productRepository.findByActiveTrue();
-    }
-
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findByIdProduct(id);
-    }
-
-    public Optional<Product> getProductByName(String name) {
-        return productRepository.findByName(name);
-    }
-
-    public boolean existsByIdProduct(Long id) {
-        return  productRepository.existsByIdProduct(id);
-    }
-
-    public boolean existsByNameProduct(String productName) {
-        return productRepository.existsByName(productName);
     }
 }

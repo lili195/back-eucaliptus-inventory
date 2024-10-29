@@ -12,17 +12,14 @@ import lombok.*;
 @NoArgsConstructor
 
 public class ProductDTO {
-    private Long idProduct;
+    private String idProduct;
     private String productName;
     private String brand;
     private EnumCategory category;
     private EnumUse use;
     private Long idProvider;
     private String description;
-    private Unit idUnit;
+    private UnitDTO unitDTO;
     private Integer minimumProductAmount;
     private Integer maximumProductAmount;
-
-    public ProductDTO(String productName, String brand, EnumCategory category, EnumUse use, Long idProvider, String description, Unit idUnit, Integer minimumProductAmount, Integer maximumProductAmount) {
-    }
 }

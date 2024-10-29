@@ -12,7 +12,6 @@ public class StockMapper {
         stock.setIdStock(stockDTO.getIdStock());
         stock.setProduct(new Product());
         stock.setQuantityAvailable(stockDTO.getQuantityAvailable());
-        stock.setProductDetail(new ProductDetail());
         return stock;
     }
 
@@ -21,7 +20,6 @@ public class StockMapper {
         stockDTO.setIdStock(stock.getIdStock());
         stockDTO.setIdProduct(stock.getProduct().getIdProduct());
         stockDTO.setQuantityAvailable(stock.getQuantityAvailable());
-        stockDTO.setIdDetProduct(stock.getProductDetail().getIdDetProduct());
         return stockDTO;
     }
 }

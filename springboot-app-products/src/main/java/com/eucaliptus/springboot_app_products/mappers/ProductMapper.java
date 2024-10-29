@@ -15,9 +15,10 @@ public class ProductMapper {
         product.setUse(productDTO.getUse());
         product.setIdProvider(productDTO.getIdProvider());
         product.setDescription(productDTO.getDescription());
-        product.setIdUnit(unit);
+        product.setUnit(unit);
         product.setMinimumProductAmount(productDTO.getMinimumProductAmount());
         product.setMaximumProductAmount(productDTO.getMaximumProductAmount());
+        product.setActive(true);
         return product;
     }
 
@@ -30,7 +31,7 @@ public class ProductMapper {
         productDTO.setUse(product.getUse());
         productDTO.setIdProvider(product.getIdProvider());
         productDTO.setDescription(product.getDescription());
-        productDTO.setIdUnit(product.getIdUnit());
+        productDTO.setUnitDTO(UnitMapper.unitToUnitDTO(product.getUnit()));
         productDTO.setMinimumProductAmount(product.getMinimumProductAmount());
         productDTO.setMaximumProductAmount(product.getMaximumProductAmount());
 

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 public class ServicesUri {
 
     public static String AUTH_SERVICE;
+    public static String PERSON_SERVICE;
     public static String FRONT_URL;
-
 
     @Value("${services.authentication}")
     private String authentication;
@@ -17,9 +17,13 @@ public class ServicesUri {
     @Value("${services.front.baseUrl}")
     private String front;
 
+    @Value("${services.person}")
+    private String person;
+
     @PostConstruct
     public void init() {
         AUTH_SERVICE = authentication;
+        PERSON_SERVICE = person;
         FRONT_URL = front;
     }
 

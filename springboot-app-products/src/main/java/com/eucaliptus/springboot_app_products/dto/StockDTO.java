@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class StockDTO {
     private Long idStock;
-    private Long idProduct;
+    private String idProduct;
     private Integer quantityAvailable;
     private Long idDetProduct;
 }
