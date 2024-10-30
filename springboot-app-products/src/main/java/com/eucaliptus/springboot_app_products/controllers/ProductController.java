@@ -4,6 +4,7 @@ import com.eucaliptus.springboot_app_products.dto.Message;
 import com.eucaliptus.springboot_app_products.dto.ProductDTO;
 import com.eucaliptus.springboot_app_products.dto.UnitDTO;
 import com.eucaliptus.springboot_app_products.mappers.ProductMapper;
+import com.eucaliptus.springboot_app_products.mappers.UnitMapper;
 import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.model.Unit;
@@ -89,7 +90,7 @@ public class ProductController {
             Optional<Unit> opUnit = unitService.getUnitByNameAndDescription(unitDTO.getUnitName(), unitDTO.getDescription());
             Unit unit = (opUnit.isPresent()) ?
                     opUnit.get() :
-                    unitService.saveUnit(new Unit(productDTO.getUnitDTO().getUnitName(), productDTO.getUnitDTO().getDescription()));
+                    unitService.saveUnit(UnitMapper.unitDTOToUnit(unitDTO));
 
             Product product = ProductMapper.productDTOToProduct(productDTO, unit);
             product = productService.saveProduct(product);
@@ -112,7 +113,7 @@ public class ProductController {
             Optional<Unit> opUnit = unitService.getUnitByNameAndDescription(unitDTO.getUnitName(), unitDTO.getDescription());
             Unit unit = (opUnit.isPresent()) ?
                     opUnit.get() :
-                    unitService.saveUnit(new Unit(productDTO.getUnitDTO().getUnitName(), productDTO.getUnitDTO().getDescription()));
+                    unitService.saveUnit(UnitMapper.unitDTOToUnit(unitDTO));
 
             Product product = ProductMapper.productDTOToProduct(productDTO, unit);
             product = productService.updateProduct(idProduct, product).get();

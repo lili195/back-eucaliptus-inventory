@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_products.controllers;
 
+import com.eucaliptus.springboot_app_products.dto.Message;
 import com.eucaliptus.springboot_app_products.dto.UnitDTO;
 import com.eucaliptus.springboot_app_products.mappers.UnitMapper;
 import com.eucaliptus.springboot_app_products.model.Unit;
@@ -7,6 +8,7 @@ import com.eucaliptus.springboot_app_products.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public class UnitController {
     public ResponseEntity<List<UnitDTO>> getAllUnits() {
         try {
             List<UnitDTO> units = unitService.getAllUnits().stream()
-                    .map(UnitMapper::unitToUnitDTO) // Aquí estás trabajando con la entidad Unit directamente
+                    .map(UnitMapper::unitToUnitDTO)
                     .collect(Collectors.toList());
             return new ResponseEntity<>(units, HttpStatus.OK);
         } catch (Exception e) {
@@ -32,13 +34,32 @@ public class UnitController {
         }
     }
 
+    @GetMapping("/getAllUnitNames")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> getAllUnitNames() {
+        try {
+            return new ResponseEntity<>(unitService.getDistinctUnitNames(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getDescriptionsByUnitName/{unitName}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> getDescriptionsByUnitName(@PathVariable("unitName") String unitName) {
+        try {
+            return new ResponseEntity<>(unitService.getDescriptionsByUnitName(unitName.toUpperCase()), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/getUnitById/{id}")
     public ResponseEntity<UnitDTO> getUnitById(@PathVariable int id) {
         try {
-            Optional<Unit> optionalUnit = unitService.getUnitById(id); // Cambia a Optional
+            Optional<Unit> optionalUnit = unitService.getUnitById(id);
             if (optionalUnit.isPresent()) {
-                UnitDTO unitDTO = UnitMapper.unitToUnitDTO(optionalUnit.get()); // Usa .get() para extraer el valor
+                UnitDTO unitDTO = UnitMapper.unitToUnitDTO(optionalUnit.get());
                 return new ResponseEntity<>(unitDTO, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -50,8 +71,11 @@ public class UnitController {
 
 
     @PostMapping("/addUnit")
-    public ResponseEntity<UnitDTO> createUnit(@RequestBody UnitDTO unitDTO) {
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> createUnit(@RequestBody UnitDTO unitDTO) {
         try {
+            if (unitService.getUnitByNameAndDescription(unitDTO.getUnitName(), unitDTO.getDescription()).isPresent())
+                return new ResponseEntity<>(new Message("Esta unidad ya existe"), HttpStatus.BAD_REQUEST);
             Unit unit = UnitMapper.unitDTOToUnit(unitDTO);
             Unit savedUnit = unitService.saveUnit(unit);
             return new ResponseEntity<>(UnitMapper.unitToUnitDTO(savedUnit), HttpStatus.CREATED);

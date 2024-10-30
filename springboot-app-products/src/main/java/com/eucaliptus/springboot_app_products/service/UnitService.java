@@ -1,6 +1,5 @@
 package com.eucaliptus.springboot_app_products.service;
 
-import com.eucaliptus.springboot_app_products.dto.UnitDTO;
 import com.eucaliptus.springboot_app_products.model.Unit;
 import com.eucaliptus.springboot_app_products.repository.UnitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UnitService {
@@ -19,6 +19,14 @@ public class UnitService {
         return unitRepository.findAll();
     }
 
+    public List<String> getDistinctUnitNames(){
+        return unitRepository.findDistinctUnitNames();
+    }
+
+    public List<String> getDescriptionsByUnitName(String unitName){
+        return unitRepository.findDistinctByUnitName(unitName).stream().map(Unit::getDescription).collect(Collectors.toList());
+    }
+
     public Optional<Unit> getUnitById(int idUnit) {
         return unitRepository.findById((long) idUnit);
     }
@@ -28,7 +36,7 @@ public class UnitService {
     }
 
     public Optional<Unit> getUnitByNameAndDescription(String name, String description) {
-        return unitRepository.findByUnitNameAndDescription(name, description);
+        return unitRepository.findByUnitNameIgnoreCaseAndDescriptionIgnoreCase(name, description);
     }
 
     public Unit saveUnit(Unit unit) {

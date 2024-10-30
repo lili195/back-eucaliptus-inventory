@@ -8,12 +8,12 @@ public class UnitMapper {
     public static Unit unitDTOToUnit(UnitDTO unitDTO) {
         Unit unit = new Unit();
         unit.setIdUnit(unitDTO.getIdUnit());
-        unit.setUnitName(unitDTO.getUnitName());
-        unit.setDescription(unitDTO.getDescription());
+        unit.setUnitName(unitDTO.getUnitName().toUpperCase());
+        unit.setDescription(unitDTO.getDescription().toUpperCase());
         return unit;
     }
 
-    public static UnitDTO unitToUnitDTO(Unit unit) { // Cambia de Optional<Unit> a Unit
+    public static UnitDTO unitToUnitDTO(Unit unit) {
         UnitDTO unitDTO = new UnitDTO();
         unitDTO.setIdUnit(unit.getIdUnit());
         unitDTO.setUnitName(unit.getUnitName());
