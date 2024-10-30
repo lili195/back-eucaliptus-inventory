@@ -11,5 +11,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     boolean existsByIdStock(Long idStock);
 
+    Optional<Stock> findByProduct_IdProduct(String idProduct);
+
     Optional<Stock> findByIdStock(Long idStock);
 }

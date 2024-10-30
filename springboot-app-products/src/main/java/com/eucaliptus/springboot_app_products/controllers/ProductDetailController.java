@@ -1,15 +1,21 @@
 package com.eucaliptus.springboot_app_products.controllers;
 
+import com.eucaliptus.springboot_app_products.dto.Message;
 import com.eucaliptus.springboot_app_products.dto.ProductDetailDTO;
 import com.eucaliptus.springboot_app_products.mappers.ProductDetailMapper;
 import com.eucaliptus.springboot_app_products.model.ProductDetail;
+import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.service.ProductDetailService;
+import com.eucaliptus.springboot_app_products.service.ProductService;
+import com.eucaliptus.springboot_app_products.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -18,9 +24,14 @@ import java.util.stream.Collectors;
 public class ProductDetailController {
 
     @Autowired
+    private ProductService productService;
+    @Autowired
     private ProductDetailService productDetailService;
+    @Autowired
+    private StockService stockService;
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<List<ProductDetailDTO>> getAllProductDetails() {
         try {
             List<ProductDetailDTO> productDetails = productDetailService.getAllProductDetails().stream()
@@ -33,16 +44,14 @@ public class ProductDetailController {
     }
 
     @GetMapping("/getProductDetailById/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<ProductDetailDTO> getProductDetailById(@PathVariable Long id) {
         try {
             if (!productDetailService.existsById(id)) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
-            // Obtén el Optional<ProductDetail> del servicio
             Optional<ProductDetail> productDetailOptional = productDetailService.getProductDetailById(id);
 
-            // Verifica si el Optional contiene un valor
             if (productDetailOptional.isPresent()) {
                 ProductDetailDTO productDetailDTO = ProductDetailMapper.productDetailToProductDetailDTO(productDetailOptional.get());
                 return new ResponseEntity<>(productDetailDTO, HttpStatus.OK);
@@ -56,9 +65,14 @@ public class ProductDetailController {
 
 
     @PostMapping("/addProductDetail")
-    public ResponseEntity<ProductDetailDTO> createProductDetail(@RequestBody ProductDetailDTO productDetailDTO) {
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> createProductDetail(@RequestBody ProductDetailDTO productDetailDTO) {
         try {
+            if (!productService.existsByIdProduct(productDetailDTO.getProductDTO().getIdProduct()))
+                return new ResponseEntity<>(new Message("Producto no encontrado"),HttpStatus.BAD_REQUEST);
             ProductDetail productDetail = ProductDetailMapper.productDetailDTOToProductDetail(productDetailDTO);
+            Stock stock = stockService.getStockByProductId(productDetailDTO.getProductDTO().getIdProduct()).get();
+            productDetail.setStock(stock);
             ProductDetail savedProductDetail = productDetailService.saveProductDetail(productDetail);
             return new ResponseEntity<>(ProductDetailMapper.productDetailToProductDetailDTO(savedProductDetail), HttpStatus.CREATED);
         } catch (Exception e) {
@@ -73,12 +87,10 @@ public class ProductDetailController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             ProductDetail productDetail = ProductDetailMapper.productDetailDTOToProductDetail(productDetailDTO);
-            productDetail.setIdDetProduct(id); // Asigna el ID al objeto ProductDetail
+            productDetail.setIdDetProduct(id);
 
-            // Llama al método que espera el ID y el objeto ProductDetail
             Optional<ProductDetail> updatedProductDetailOptional = productDetailService.updateProductDetail(id, productDetail);
 
-            // Verifica si el Optional contiene un valor
             if (updatedProductDetailOptional.isPresent()) {
                 ProductDetail updatedProductDetail = updatedProductDetailOptional.get(); // Obtén el valor del Optional
                 return new ResponseEntity<>(ProductDetailMapper.productDetailToProductDetailDTO(updatedProductDetail), HttpStatus.OK);

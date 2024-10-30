@@ -22,6 +22,10 @@ public class StockService {
         return stockRepository.findById(idStock);
     }
 
+    public Optional<Stock> getStockByProductId(String productId) {
+        return stockRepository.findByProduct_IdProduct(productId);
+    }
+
     public Stock saveStock(Stock stock) {
         return stockRepository.save(stock);
     }

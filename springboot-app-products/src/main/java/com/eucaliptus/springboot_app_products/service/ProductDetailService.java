@@ -29,7 +29,10 @@ public class ProductDetailService {
     public Optional<ProductDetail> updateProductDetail(Long idDetProduct, ProductDetail productDetailDetails) {
         return productDetailRepository.findById(idDetProduct).map(productDetail -> {
             productDetail.setQuantity(productDetailDetails.getQuantity());
-            productDetail.setUnitPrice(productDetailDetails.getUnitPrice());
+            productDetail.setInputUnitPrice(productDetailDetails.getInputUnitPrice());
+            productDetail.setInputUnitPriceWithoutIVA(productDetailDetails.getInputUnitPriceWithoutIVA());
+            productDetail.setOutputUnitPrice(productDetailDetails.getOutputUnitPrice());
+            productDetail.setOutputUnitPriceWithoutIVA(productDetailDetails.getOutputUnitPriceWithoutIVA());
             productDetail.setBatch(productDetailDetails.getBatch());
             productDetail.setDueDate(productDetailDetails.getDueDate());
             return productDetailRepository.save(productDetail);
