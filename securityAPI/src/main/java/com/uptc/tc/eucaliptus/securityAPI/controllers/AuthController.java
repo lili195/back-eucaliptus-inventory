@@ -1,15 +1,12 @@
 package com.uptc.tc.eucaliptus.securityAPI.controllers;
 
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.LoginUser;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.TokenDTO;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.UpdateUserDTO;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.UserDTO;
+import com.uptc.tc.eucaliptus.securityAPI.infraestructure.dtos.*;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Message;
+import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.RecoveryCode;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.Role;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.entities.User;
 import com.uptc.tc.eucaliptus.securityAPI.infraestructure.enums.RoleList;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.RoleService;
-import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.UserService;
+import com.uptc.tc.eucaliptus.securityAPI.infraestructure.services.*;
 import com.uptc.tc.eucaliptus.securityAPI.security.jwt.JwtProvider;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,20 +22,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @RestController()
 @RequestMapping("/auth")
-public class Controller {
+public class AuthController {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final EmailService emailService;
+    private final RecoveryCodeService recoveryCodeService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public Controller(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager) {
+    public AuthController(UserService userService, RoleService roleService, EmailService emailService, RecoveryCodeService recoveryCodeService, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.roleService = roleService;
+        this.emailService = emailService;
+        this.recoveryCodeService = recoveryCodeService;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
         this.authenticationManager = authenticationManager;
@@ -57,7 +61,6 @@ public class Controller {
 
             User user = userService.getByUserName(username).get();
             String token = jwtProvider.generateToken(loginUser.getUsername(), user.getRole(), user.getEmail());
-            //tokenService.save(new TokenEntity(token, userService.getByUserName(username).get()));
             Claims claims = jwtProvider.getAllClaims(token);
             TokenDTO tokenDTO = new TokenDTO(token, claims.get("role", String.class), username, claims.get("email", String.class));
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
@@ -69,6 +72,8 @@ public class Controller {
     @PostMapping("/addSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> addSeller(@Valid @RequestBody UserDTO userDTO){
+        if (userService.getByEmail(userDTO.getEmail()).isPresent())
+            return new ResponseEntity<>(new Message("El email ya existe"), HttpStatus.BAD_REQUEST);
         Role role = roleService.save(new Role(RoleList.ROLE_SELLER));;
         User userEntity = new User(userDTO.getUsername(),
                 userDTO.getEmail(),
@@ -127,14 +132,10 @@ public class Controller {
         }
     }
 
-
-
     @DeleteMapping("/deleteSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteSeller(@RequestParam String username ){
-        System.out.println(username);
         if(userService.existByUserName(username)){
-            //tokenService.deleteByUserId(userService.getByUserName(username).get().getId());
             userService.delete(username);
             return new ResponseEntity<>(new Message("Usuario eliminado existosamente"), HttpStatus.OK);
         } else {
@@ -144,8 +145,63 @@ public class Controller {
 
     @GetMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletResponse response, HttpServletRequest request){
-        //tokenService.delete(request.getHeader("Authorization").substring(7));
         return new ResponseEntity<>(new Message("Se ha cerrado la sesion"), HttpStatus.OK);
+    }
+
+    @PostMapping("/requestRecoveryPassword/{email}")
+    public ResponseEntity<Object> requestRecoveryPassword(@PathVariable String email){
+        try{
+            recoveryCodeService.deleteExpiratedCodes();
+            Optional<User> opUser = userService.getByEmail(email);
+            if(opUser.isEmpty())
+                return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
+            User user = opUser.get();
+            int code = recoveryCodeService.generateCode();
+            LocalDateTime expirationDate = recoveryCodeService.getExpirationDate();
+            RecoveryCode recoveryCode = recoveryCodeService.saveNewRecoveryCode(new RecoveryCode(code, user, expirationDate));
+            emailService.sendEmailPasswordRecovery(user.getEmail(), code);
+            return new ResponseEntity<>(recoveryCode, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/validateRecoveryCode")
+    public ResponseEntity<Object> validateRecoveryCode(@RequestBody RecoveryCodeDTO recoveryCodeDTO){
+        try{
+            recoveryCodeService.deleteExpiratedCodes();
+            Optional<User> opUser = userService.getByEmail(recoveryCodeDTO.getEmail());
+            if(opUser.isEmpty())
+                return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
+            User user = opUser.get();
+            if (!recoveryCodeService.existsByCodeAndUser(recoveryCodeDTO.getCode(), user.getId()))
+                return new ResponseEntity<>(new Message("Codigo no valido"), HttpStatus.BAD_REQUEST);
+            RecoveryCode recoveryCode = recoveryCodeService.findByCode(recoveryCodeDTO.getCode()).get();
+            recoveryCode.setExpiryDate(LocalDateTime.now().plusDays(1));
+            recoveryCodeService.saveNewRecoveryCode(recoveryCode);
+            return new ResponseEntity<>(new Message("Codigo valido"), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/recoveryPassword")
+    public ResponseEntity<Object> recoveryPassword(@RequestBody RecoveryPasswordDTO recoveryPasswordDTO){
+        try{
+            Optional<User> opUser = userService.getByEmail(recoveryPasswordDTO.getEmail());
+            if(opUser.isEmpty())
+                return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
+            User user = opUser.get();
+            user.setPassword(passwordEncoder.encode(recoveryPasswordDTO.getNewPassword()));
+            userService.save(user);
+            recoveryCodeService.deleteByCode(recoveryPasswordDTO.getCode());
+            return new ResponseEntity<>(new Message("Contraseña"), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
