@@ -160,7 +160,7 @@ public class AuthController {
             LocalDateTime expirationDate = recoveryCodeService.getExpirationDate();
             RecoveryCode recoveryCode = recoveryCodeService.saveNewRecoveryCode(new RecoveryCode(code, user, expirationDate));
             emailService.sendEmailPasswordRecovery(user.getEmail(), code);
-            return new ResponseEntity<>(recoveryCode, HttpStatus.OK);
+            return new ResponseEntity<>(new RecoveryCodeDTO(recoveryCode.getUser().getEmail(), recoveryCode.getUser().getUsername(), recoveryCode.getCode()), HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -194,10 +194,12 @@ public class AuthController {
             if(opUser.isEmpty())
                 return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
             User user = opUser.get();
+            if (!recoveryCodeService.existsByCodeAndUser(recoveryPasswordDTO.getCode(), user.getId()))
+                return new ResponseEntity<>(new Message("Codigo no valido"), HttpStatus.BAD_REQUEST);
             user.setPassword(passwordEncoder.encode(recoveryPasswordDTO.getNewPassword()));
             userService.save(user);
             recoveryCodeService.deleteByCode(recoveryPasswordDTO.getCode());
-            return new ResponseEntity<>(new Message("Contraseña"), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("Contraseña modificada correctamente"), HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);

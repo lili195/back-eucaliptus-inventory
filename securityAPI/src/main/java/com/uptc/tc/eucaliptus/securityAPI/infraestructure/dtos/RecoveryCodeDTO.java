@@ -9,5 +9,6 @@ import lombok.*;
 @Setter
 public class RecoveryCodeDTO {
     private String email;
+    private String username;
     private int code;
 }
