@@ -7,6 +7,7 @@ import com.eucaliptus.springboot_app_products.model.ProductDetail;
 import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.service.ProductDetailService;
 import com.eucaliptus.springboot_app_products.service.ProductService;
+import com.eucaliptus.springboot_app_products.service.PurchaseService;
 import com.eucaliptus.springboot_app_products.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +31,8 @@ public class ProductDetailController {
     private ProductDetailService productDetailService;
     @Autowired
     private StockService stockService;
+    @Autowired
+    private PurchaseService purchaseService;
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -79,6 +83,21 @@ public class ProductDetailController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/addPurchase")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> addPurchase(@RequestBody List<ProductDetailDTO> productsDetails) {
+        try {
+            List<ProductDetailDTO> productsDetailsAdded = purchaseService.addPurchase(productsDetails);
+            return new ResponseEntity<>(productsDetailsAdded, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new Message(e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo más tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @PutMapping("/updateProductDetail/{id}")
     public ResponseEntity<ProductDetailDTO> updateProductDetail(@PathVariable Long id, @RequestBody ProductDetailDTO productDetailDTO) {
