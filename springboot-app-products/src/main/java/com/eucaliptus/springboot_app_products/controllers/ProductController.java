@@ -2,6 +2,7 @@ package com.eucaliptus.springboot_app_products.controllers;
 
 import com.eucaliptus.springboot_app_products.dto.Message;
 import com.eucaliptus.springboot_app_products.dto.ProductDTO;
+import com.eucaliptus.springboot_app_products.dto.ProductExpiringSoonDTO;
 import com.eucaliptus.springboot_app_products.dto.UnitDTO;
 import com.eucaliptus.springboot_app_products.mappers.ProductMapper;
 import com.eucaliptus.springboot_app_products.mappers.UnitMapper;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -139,6 +142,12 @@ public class ProductController {
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo más tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/expiring-soon")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public List<ProductExpiringSoonDTO> getProductsExpiringSoon() {
+        return productService.getProductsExpiringSoon();
     }
 
 }

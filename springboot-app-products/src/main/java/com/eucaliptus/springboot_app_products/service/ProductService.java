@@ -1,6 +1,7 @@
 package com.eucaliptus.springboot_app_products.service;
 
 import com.eucaliptus.springboot_app_person.dtos.ProviderDTO;
+import com.eucaliptus.springboot_app_products.dto.ProductExpiringSoonDTO;
 import com.eucaliptus.springboot_app_products.utlities.ServicesUri;
 import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.repository.ProductRepository;
@@ -100,5 +101,9 @@ public class ProductService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         return headers;
+    }
+
+    public List<ProductExpiringSoonDTO> getProductsExpiringSoon() {
+        return productRepository.findProductsExpiringSoon();
     }
 }

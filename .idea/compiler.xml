@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="springboot-app-person" />
+        <module name="springboot_app_billing" />
         <module name="eureka-server" />
         <module name="springboot-app-products" />
         <module name="securityAPI" />
@@ -20,6 +21,7 @@
       <module name="securityAPI" options="-parameters" />
       <module name="springboot-app-person" options="-parameters" />
       <module name="springboot-app-products" options="-parameters" />
+      <module name="springboot_app_billing" options="-parameters" />
     </option>
   </component>
 </project>
