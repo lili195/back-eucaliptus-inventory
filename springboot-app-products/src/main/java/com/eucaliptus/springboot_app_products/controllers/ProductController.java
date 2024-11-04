@@ -118,7 +118,7 @@ public class ProductController {
             Product product = ProductMapper.productDTOToProduct(productDTO, unit);
             product = productService.updateProduct(idProduct, product).get();
 
-            return new ResponseEntity<>(product, HttpStatus.OK);
+            return new ResponseEntity<>(ProductMapper.productToProductDTO(product), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo más tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
