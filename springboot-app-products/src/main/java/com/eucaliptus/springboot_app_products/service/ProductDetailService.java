@@ -5,6 +5,7 @@ import com.eucaliptus.springboot_app_products.repository.ProductDetailRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,10 @@ public class ProductDetailService {
 
     public boolean existsByIdProductDetail(Long idDetProduct) {
         return productDetailRepository.existsById(idDetProduct);
+    }
+
+    public boolean existsByIdProductAndBatch(String productId, Date batch){
+        return productDetailRepository.existsByStock_Product_IdProductAndBatch(productId, batch);
     }
 
     public boolean deleteProductDetail(Long idDetProduct) {

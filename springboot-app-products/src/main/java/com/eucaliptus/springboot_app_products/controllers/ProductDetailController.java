@@ -98,6 +98,12 @@ public class ProductDetailController {
         }
     }
 
+    @PostMapping("/validatePurchase")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> validatePurchase(@RequestBody List<ProductDetailDTO> productsDetails) {
+        return purchaseService.validatePurchase(productsDetails);
+    }
+
 
     @PutMapping("/updateProductDetail/{id}")
     public ResponseEntity<ProductDetailDTO> updateProductDetail(@PathVariable Long id, @RequestBody ProductDetailDTO productDetailDTO) {

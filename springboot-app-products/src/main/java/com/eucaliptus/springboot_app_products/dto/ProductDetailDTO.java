@@ -20,4 +20,8 @@ public class ProductDetailDTO {
     private Integer iva;
     private Date batch;
     private Date dueDate;
+
+//    public boolean compareTo(ProductDetailDTO productDetailDTO) {
+//
+//    }
 }
