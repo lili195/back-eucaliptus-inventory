@@ -2,28 +2,28 @@ package com.eucaliptus.springboot_app_person.mappers;
 
 import com.eucaliptus.springboot_app_person.dtos.CompanyDTO;
 import com.eucaliptus.springboot_app_person.model.Company;
+import com.eucaliptus.springboot_app_person.model.DocumentType;
 
 public class CompanyMapper {
 
-    public static Company companyDTOToCompany(CompanyDTO companyDTO) {
+    public static Company companyDTOToCompany(CompanyDTO companyDTO, DocumentType documentType) {
         return new Company(companyDTO.getNit(),
                 companyDTO.getCompanyName(),
-                companyDTO.getCompanyPhoneNumber(),
+                null,
                 companyDTO.getCompanyEmail(),
                 companyDTO.getCompanyAddress(),
-                companyDTO.getBankName(),
-                companyDTO.getBankAccountNumber());
+                companyDTO.getCompanyPhoneNumber(),
+                documentType
+        );
     }
 
     public static CompanyDTO companyToCompanyDTO(Company company) {
         return new CompanyDTO(
-                company.getNitCompany(),
-                company.getNameCompany(),
+                company.getIdNumber(),
+                company.getFirstName(),
                 company.getPhoneNumber(),
                 company.getEmail(),
-                company.getAddress(),
-                company.getBankName(),
-                company.getBankAccountNumber()
+                company.getAddress()
         );
     }
 }

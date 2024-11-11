@@ -23,34 +23,41 @@ public class ProviderService {
         return providerRepository.findByActiveTrue();
     }
 
-    public Optional<Provider> getProviderById(Long id) {
-        return providerRepository.findById(id);
+    public Optional<Provider> getProviderById(String id) {
+        return providerRepository.findByIdNumber(id);
     }
 
-    public Optional<Provider> getProviderByPersonId(String idPerson) {
-        return providerRepository.findByPerson_IdNumber(idPerson);
+    public Optional<Provider> getProviderByCompanyId(String companyId) {
+        return providerRepository.findByActiveTrueAndCompany_IdNumber(companyId);
     }
 
     public Provider saveProvider(Provider provider) {
         return providerRepository.save(provider);
     }
 
-    public boolean existsById(Long id) {
-        return providerRepository.existsByIdProvider(id);
+    public boolean existsById(String id) {
+        return providerRepository.existsByIdNumber(id);
     }
 
-    public Optional<Provider> updateProvider(Long id, Provider providerDetails) {
-        return providerRepository.findById(id).map(provider -> {
+    public Optional<Provider> updateProvider(String id, Provider providerDetails) {
+        return providerRepository.findByIdNumber(id).map(provider -> {
+            provider.setFirstName(providerDetails.getFirstName());
+            provider.setLastName(providerDetails.getLastName());
+            provider.setEmail(providerDetails.getEmail());
+            provider.setAddress(providerDetails.getAddress());
+            provider.setPhoneNumber(providerDetails.getPhoneNumber());
+            provider.setDocumentType(providerDetails.getDocumentType());
+            provider.setBankName(providerDetails.getBankName());
+            provider.setBankAccountNumber(providerDetails.getBankAccountNumber());
             provider.setPersonType(providerDetails.getPersonType());
             provider.setCompany(providerDetails.getCompany());
             return providerRepository.save(provider);
         });
     }
 
-    public boolean deleteProvider(Long id) {
-        return providerRepository.findById(id).map(provider -> {
+    public boolean deleteProvider(String id) {
+        return providerRepository.findByIdNumber(id).map(provider -> {
             provider.setActive(false);
-            provider.getPerson().setActive(false);
             providerRepository.save(provider);
             return true;
         }).orElse(false);

@@ -7,17 +7,17 @@ import com.eucaliptus.springboot_app_person.model.Role;
 
 public class PersonMapper {
 
-    public static Person personDTOToPerson(PersonDTO personDTO, Role role, DocumentType documentType) {
-        Person person = new Person();
-        person.setIdNumber(personDTO.getIdPerson());
-        person.setFirstName(personDTO.getFirstName());
-        person.setLastName(personDTO.getLastName());
-        person.setEmail(personDTO.getEmail());
-        person.setPhoneNumber(personDTO.getPhoneNumber());
-        person.setDocumentType(documentType);
-        person.setRole(role);
-        return person;
-    }
+//    public static Person personDTOToPerson(PersonDTO personDTO, Role role, DocumentType documentType) {
+//        Person person = new Person();
+//        person.setIdNumber(personDTO.getIdPerson());
+//        person.setFirstName(personDTO.getFirstName());
+//        person.setLastName(personDTO.getLastName());
+//        person.setEmail(personDTO.getEmail());
+//        person.setPhoneNumber(personDTO.getPhoneNumber());
+//        person.setDocumentType(documentType);
+//        person.setRole(role);
+//        return person;
+//    }
 
     public static PersonDTO personToPersonDTO(Person person) {
         PersonDTO personDTO = new PersonDTO();
@@ -27,7 +27,6 @@ public class PersonMapper {
         personDTO.setEmail(person.getEmail());
         personDTO.setPhoneNumber(person.getPhoneNumber());
         personDTO.setDocumentType(person.getDocumentType().getNameType().name());
-        personDTO.setRole(person.getRole().getNameRole().name());
         return personDTO;
     }
 }

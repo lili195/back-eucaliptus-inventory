@@ -2,6 +2,7 @@ package com.eucaliptus.springboot_app_person.services;
 
 import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.model.Person;
+import com.eucaliptus.springboot_app_person.model.Seller;
 import com.eucaliptus.springboot_app_person.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,12 @@ public class PersonService {
         return personRepository.findByIdNumber(idNumber);
     }
 
-    public Optional<Person> getAdmin(){
-        return personRepository.findByRole_nameRole(EnumRole.ROLE_ADMIN);
+    public Optional<Person> getActivePersonById(String idNumber) {
+        return personRepository.findByActiveTrueAndIdNumber(idNumber);
+    }
+
+    public Optional<Seller> getAdmin(){
+        return personRepository.findByRole(EnumRole.ROLE_ADMIN);
     }
 
     public Person savePerson(Person person) {
@@ -38,7 +43,6 @@ public class PersonService {
             person.setPhoneNumber(personDetails.getPhoneNumber());
             person.setEmail(personDetails.getEmail());
             person.setDocumentType(personDetails.getDocumentType());
-            person.setRole(personDetails.getRole());
             return personRepository.save(person);
         });
     }

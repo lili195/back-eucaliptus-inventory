@@ -1,6 +1,7 @@
 package com.eucaliptus.springboot_app_person.model;
 
 import com.eucaliptus.springboot_app_person.enums.EnumPersonType;
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,33 +12,34 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "providers")
-public class Provider {
+//@DiscriminatorValue("ROLE_PROVIDER")
+public class Provider extends Person{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_provider")
-    private Long idProvider;
+    @Column(name = "bank_name")
+    private String bankName;
 
-    @OneToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id_number")
-    private Person person;
+    @Column(name = "bank_account_number")
+    private String bankAccountNumber;
 
     @Column(name = "person_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private EnumPersonType personType;
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "nit_company", referencedColumnName = "nit_company")
+    @JoinColumn(name = "id_company", referencedColumnName = "id_number")
     private Company company;
 
-    @Column(name = "active")
-    private boolean active;
-
-    public Provider(Person person,
-                    EnumPersonType personType, Company company){;
-        this.person = person;
+    public Provider (String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType,
+                     String bankName, String bankAccountNumber, EnumPersonType personType, Company company){
+        super(idNumber, firstName, lastName, email, address, phoneNumber, documentType, EnumRole.ROLE_PROVIDER);
+        this.bankName = bankName;
+        this.bankAccountNumber = bankAccountNumber;
         this.personType = personType;
         this.company = company;
-        this.active = true;
     }
+
+    public Provider (String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType){
+        super(idNumber, firstName, lastName, email, address, phoneNumber, documentType, EnumRole.ROLE_PROVIDER);
+    }
+
 }

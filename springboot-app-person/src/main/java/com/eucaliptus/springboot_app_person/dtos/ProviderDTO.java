@@ -8,8 +8,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProviderDTO {
-    private String idProvider;
     private PersonDTO personDTO;
+    private String bankName;
+    private String bankAccountNumber;
     private String personType;
     private CompanyDTO companyDTO;
 }

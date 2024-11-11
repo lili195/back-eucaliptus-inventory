@@ -1,20 +1,10 @@
 package com.eucaliptus.springboot_app_person.services;
 
-import com.eucaliptus.springboot_app_person.dtos.Message;
-import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
-import com.eucaliptus.springboot_app_person.dtos.UserDTO;
 import com.eucaliptus.springboot_app_person.model.Seller;
 import com.eucaliptus.springboot_app_person.repository.SellerRepository;
-import com.eucaliptus.springboot_app_person.utlities.ServicesUri;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,12 +22,12 @@ public class SellerService {
         return sellerRepository.findByActiveTrue();
     }
 
-    public Optional<Seller> getSellerById(Long id) {
+    public Optional<Seller> getSellerById(String id) {
         return sellerRepository.findById(id);
     }
 
     public Optional<Seller> getSellerByPersonId(String personId) {
-        return sellerRepository.findByPerson_IdNumber(personId);
+        return sellerRepository.findByIdNumber(personId);
     }
 
     public Optional<Seller> getSellerByUsername(String username) {
@@ -48,26 +38,30 @@ public class SellerService {
         return sellerRepository.save(seller);
     }
 
-    public Optional<Seller> updateSeller(Long id, Seller sellerDetails) {
-        return sellerRepository.findById(id).map(seller -> {
+    public Optional<Seller> updateSeller(String id, Seller sellerDetails) {
+        return sellerRepository.findByIdNumber(id).map(seller -> {
+            seller.setFirstName(sellerDetails.getFirstName());
+            seller.setLastName(sellerDetails.getLastName());
+            seller.setEmail(sellerDetails.getEmail());
+            seller.setAddress(sellerDetails.getAddress());
+            seller.setPhoneNumber(sellerDetails.getPhoneNumber());
+            seller.setDocumentType(sellerDetails.getDocumentType());
             seller.setUsername(sellerDetails.getUsername());
-            seller.setHomeAddress(sellerDetails.getHomeAddress());
             return sellerRepository.save(seller);
         });
     }
 
-    public boolean existsById(Long id) {
-        return sellerRepository.existsById(id);
+    public boolean existsById(String id) {
+        return sellerRepository.existsByIdNumber(id);
     }
 
     public boolean existsByUsername(String username){
         return sellerRepository.existsByUsername(username);
     }
 
-    public boolean deleteSeller(Long id, String token) {
-        return sellerRepository.findById(id).map(seller -> {
+        public boolean deleteSeller(String id, String token) {
+        return sellerRepository.findByIdNumber(id).map(seller -> {
             seller.setActive(false);
-            seller.getPerson().setActive(false);
             sellerRepository.save(seller);
             return true;
         }).orElse(false);

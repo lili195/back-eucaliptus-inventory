@@ -13,6 +13,4 @@ public class CompanyDTO {
     private String companyPhoneNumber;
     private String companyEmail;
     private String companyAddress;
-    private String bankName;
-    private String bankAccountNumber;
 }

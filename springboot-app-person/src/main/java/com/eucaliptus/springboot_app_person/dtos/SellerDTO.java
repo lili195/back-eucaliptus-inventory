@@ -8,9 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 public class SellerDTO {
-    private String idSeller;
     private PersonDTO personDTO;
     private String username;
     private String password;
-    private String homeAddress;
 }

@@ -1,6 +1,7 @@
 package com.eucaliptus.springboot_app_person.model;
 
 
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,32 +12,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "sellers")
-public class Seller {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_seller")
-    private Long idSeller;
-
-    @OneToOne
-    @JoinColumn(name = "person_id", referencedColumnName = "id_number")
-    private Person person;
+//@DiscriminatorValue("ROLE_SELLER")
+public class Seller extends Person{
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "home_address", nullable = false)
-    private String homeAddress;
-
-    @Column(name = "active")
-    private boolean active;
-
-    public Seller(Person person,
-                  String documentNumber, String username, String homeAddress) {
-        this.person = person;
-        this.person.setIdNumber(documentNumber);
+    public Seller(String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType,
+                  String username) {
+        super(idNumber, firstName, lastName, email, address, phoneNumber, documentType, EnumRole.ROLE_SELLER);
         this.username = username;
-        this.homeAddress = homeAddress;
-        this.active = true;
+    }
+
+    public Seller(String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType) {
+        super(idNumber, firstName, lastName, email, address, phoneNumber, documentType, EnumRole.ROLE_SELLER);
     }
 }

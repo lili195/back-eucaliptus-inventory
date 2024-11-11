@@ -12,7 +12,7 @@ public class PersonDTO {
     private String firstName;
     private String lastName;
     private String email;
+    private String address;
     private String phoneNumber;
     private String documentType;
-    private String role;
 }

@@ -23,12 +23,13 @@ public class CompanyService {
     }
 
     public boolean existsByNItCompany(String id) {
-        return companyRepository.existsByNitCompany(id);
+        return companyRepository.existsByIdNumber(id);
     }
 
-    public boolean deleteByNitCompany(String nitCompany) {
+    public boolean deleteCompany(String nitCompany) {
         return companyRepository.findById(nitCompany).map(company -> {
-            companyRepository.delete(company);
+            company.setActive(false);
+            companyRepository.save(company);
             return true;
         }).orElse(false);
     }
@@ -39,12 +40,10 @@ public class CompanyService {
 
     public Optional<Company> update(String nitCompany, Company companyDetails) {
         return companyRepository.findById(nitCompany).map(company -> {
-            company.setNameCompany(companyDetails.getNameCompany());
+            company.setFirstName(companyDetails.getFirstName());
             company.setPhoneNumber(companyDetails.getPhoneNumber());
             company.setEmail(companyDetails.getEmail());
             company.setAddress(companyDetails.getAddress());
-            company.setBankName(companyDetails.getBankName());
-            company.setBankAccountNumber(companyDetails.getBankAccountNumber());
             return companyRepository.save(company);
         });
     }

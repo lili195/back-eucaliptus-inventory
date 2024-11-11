@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SellerRepository extends JpaRepository<Seller, Long> {
+public interface SellerRepository extends JpaRepository<Seller, String> {
 
-    boolean existsByIdSeller(Long id);
+    boolean existsByIdNumber(String id);
 
     boolean existsByUsername(String Username);
 
     List<Seller> findByActiveTrue();
 
-    Optional<Seller> findByPerson_IdNumber(String personId);
+    Optional<Seller> findByIdNumber(String personId);
 
     Optional<Seller> getByUsername(String username);
 }

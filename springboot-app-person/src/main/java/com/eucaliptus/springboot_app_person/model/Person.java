@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_person.model;
 
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity(name = "persons")
-public class Person {
+@Inheritance(strategy = InheritanceType.JOINED)
+//@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
+public abstract class Person {
 
     @Id
     @Column(name = "id_number")
@@ -18,11 +21,14 @@ public class Person {
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
 
     @Column(name = "email")
     private String email;
+
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -31,18 +37,19 @@ public class Person {
     @JoinColumn(name = "id_document_type", referencedColumnName = "id_document_type")
     private DocumentType documentType;
 
-    @ManyToOne
-    @JoinColumn(name = "id_role", referencedColumnName = "id_role")
-    private Role role;
-
     @Column(name = "active")
     private boolean active;
 
-    public Person(String idNumber, String firstName, String lastName, String email, String phoneNumber, DocumentType documentType, Role role) {
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EnumRole role;
+
+    public Person(String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType, EnumRole role) {
         this.idNumber = idNumber;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.address = address;
         this.phoneNumber = phoneNumber;
         this.documentType = documentType;
         this.role = role;
