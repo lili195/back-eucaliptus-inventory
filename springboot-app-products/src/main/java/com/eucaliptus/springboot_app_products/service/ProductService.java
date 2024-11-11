@@ -46,10 +46,9 @@ public class ProductService {
         return productRepository.existsByName(productName);
     }
 
-    public boolean existsProviderId(Long providerId, String token) {
+    public boolean existsProviderId(String  providerId, String token) {
         try{
             HttpEntity<String> entity = new HttpEntity<>(getHeader(token));
-            System.out.println(ServicesUri.PERSON_SERVICE + "/person/providers/getProviderById/" + providerId);
             ResponseEntity<ProviderDTO> response = restTemplate.exchange(
                 ServicesUri.PERSON_SERVICE + "/person/providers/getProviderById/" + providerId,
                     HttpMethod.GET,

@@ -17,7 +17,7 @@ public class ProductDTO {
     private String brand;
     private EnumCategory category;
     private EnumUse use;
-    private Long idProvider;
+    private String idProvider;
     private String description;
     private UnitDTO unitDTO;
     private Integer minimumProductAmount;
