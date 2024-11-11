@@ -63,6 +63,19 @@ public class ProviderController {
         }
     }
 
+    @GetMapping("/getCompanyByNit/{nit}")
+    public ResponseEntity<Object> getCompanyByNit(@PathVariable String nit){
+        try{
+            Optional<Company> opCompany = companyService.findById(nit);
+            if (opCompany.isPresent())
+                return new ResponseEntity<>(CompanyMapper.companyToCompanyDTO(opCompany.get()), HttpStatus.OK);
+            return new ResponseEntity<>(new Message("Empresa no encontrada"), HttpStatus.BAD_REQUEST);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/validateNewProvider")
     public ResponseEntity<Object> validateNewProvider(@RequestBody ProviderDTO providerDTO){
         try{
