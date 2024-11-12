@@ -22,7 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     List<Product> findByActiveTrue();
 
-    List<Product> findByIdProviderAndActiveTrue(Long idProvider);
+    List<Product> findByIdProviderAndActiveTrue(String idProvider);
 
     boolean existsByName(String productName);
 

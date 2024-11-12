@@ -33,7 +33,7 @@ public class Product {
     private EnumUse use;
 
     @Column(name = "id_provider")
-    private Long idProvider;
+    private String idProvider;
 
     @Column(name = "description")
     private String description;
@@ -51,7 +51,7 @@ public class Product {
     @Column(name = "isActive")
     private boolean active;
 
-    public Product(String idProduct, String productName, String brand, String category, String use, Long idProvider, String description, Unit unit, Integer minimumProductAmount, Integer maximumProductAmount) {
+    public Product(String idProduct, String productName, String brand, String category, String use, String idProvider, String description, Unit unit, Integer minimumProductAmount, Integer maximumProductAmount) {
         this.idProduct = idProduct;
         this.name = productName;
         this.brand = brand;

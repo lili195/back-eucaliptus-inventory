@@ -26,7 +26,7 @@ public class ProductService {
         return productRepository.findByActiveTrue();
     }
 
-    public List<Product> getProductsByIdProvider(Long idProvider) {
+    public List<Product> getProductsByIdProvider(String idProvider) {
         return productRepository.findByIdProviderAndActiveTrue(idProvider);
     }
 

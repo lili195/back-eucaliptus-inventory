@@ -71,7 +71,7 @@ public class ProductController {
 
     @GetMapping("getProductsByProvider/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<Object> getProductsByProvider(@PathVariable("id") Long providerId) {
+    public ResponseEntity<Object> getProductsByProvider(@PathVariable("id") String providerId) {
         try{
             return new ResponseEntity<>(productService.getProductsByIdProvider(providerId).stream().
                     map(ProductMapper::productToProductDTO).collect(Collectors.toList()), HttpStatus.OK);
