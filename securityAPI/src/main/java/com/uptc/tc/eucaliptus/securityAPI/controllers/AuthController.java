@@ -80,6 +80,8 @@ public class AuthController {
                 passwordEncoder.encode(userDTO.getPassword()),
                 role);
         if(!userService.existByUserName(userDTO.getUsername())) {
+            if (!emailService.sendEmailCredentials(userDTO.getEmail(), userDTO.getUsername(), userDTO.getPassword()))
+                return new ResponseEntity<>(new Message("Email inválido"), HttpStatus.NOT_FOUND);
             User userSaved = userService.save(userEntity);
             UserDTO userSavedDTO = new UserDTO(userSaved.getUsername(), userSaved.getEmail(), userDTO.getPassword(), userDTO.getRole());
             return new ResponseEntity<>(userSavedDTO, HttpStatus.CREATED);

@@ -28,7 +28,7 @@ public class ProviderService {
     }
 
     public Optional<Provider> getProviderByCompanyId(String companyId) {
-        return providerRepository.findByActiveTrueAndCompany_IdNumber(companyId);
+        return providerRepository.findByActiveTrueAndNitCompany(companyId);
     }
 
     public Provider saveProvider(Provider provider) {
@@ -50,7 +50,11 @@ public class ProviderService {
             provider.setBankName(providerDetails.getBankName());
             provider.setBankAccountNumber(providerDetails.getBankAccountNumber());
             provider.setPersonType(providerDetails.getPersonType());
-            provider.setCompany(providerDetails.getCompany());
+            provider.setNitCompany(providerDetails.getNitCompany());
+            provider.setNameCompany(providerDetails.getNameCompany());
+            provider.setEmailCompany(providerDetails.getEmailCompany());
+            provider.setAddressCompany(providerDetails.getAddressCompany());
+            provider.setPhoneNumberCompany(providerDetails.getPhoneNumberCompany());
             return providerRepository.save(provider);
         });
     }

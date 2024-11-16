@@ -37,6 +37,7 @@ public class UserService {
             System.out.println(HttpStatus.CREATED);
             return response.getStatusCode() == HttpStatus.CREATED;
         } catch (Exception e){
+            e.printStackTrace();
             return false;
         }
     }

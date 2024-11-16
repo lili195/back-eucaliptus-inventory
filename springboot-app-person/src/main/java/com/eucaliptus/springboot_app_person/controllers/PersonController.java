@@ -1,15 +1,10 @@
 package com.eucaliptus.springboot_app_person.controllers;
 
 import com.eucaliptus.springboot_app_person.dtos.Message;
-import com.eucaliptus.springboot_app_person.dtos.PersonDTO;
-import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
-import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.mappers.PersonMapper;
 import com.eucaliptus.springboot_app_person.model.Person;
 import com.eucaliptus.springboot_app_person.model.Seller;
-import com.eucaliptus.springboot_app_person.services.DocumentTypeService;
 import com.eucaliptus.springboot_app_person.services.PersonService;
-import com.eucaliptus.springboot_app_person.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

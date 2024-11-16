@@ -25,17 +25,33 @@ public class Provider extends Person{
     @Enumerated(EnumType.STRING)
     private EnumPersonType personType;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "id_company", referencedColumnName = "id_number")
-    private Company company;
+    @Column(name = "nit_company")
+    private String nitCompany;
+
+    @Column(name = "name_company")
+    private String nameCompany;
+
+    @Column(name = "email_company")
+    private String emailCompany;
+
+    @Column(name = "phone_number_company")
+    private String phoneNumberCompany;
+
+    @Column(name = "address_company")
+    private String addressCompany;
 
     public Provider (String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType,
-                     String bankName, String bankAccountNumber, EnumPersonType personType, Company company){
+                     String bankName, String bankAccountNumber, EnumPersonType personType,
+                     String nitCompany, String nameCompany, String emailCompany, String phoneNumberCompany, String addressCompany){
         super(idNumber, firstName, lastName, email, address, phoneNumber, documentType, EnumRole.ROLE_PROVIDER);
         this.bankName = bankName;
         this.bankAccountNumber = bankAccountNumber;
         this.personType = personType;
-        this.company = company;
+        this.nitCompany = nitCompany;
+        this.nameCompany = nameCompany;
+        this.emailCompany = emailCompany;
+        this.phoneNumberCompany = phoneNumberCompany;
+        this.addressCompany = addressCompany;
     }
 
     public Provider (String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType){

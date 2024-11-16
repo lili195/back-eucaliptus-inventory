@@ -16,6 +16,6 @@ public interface ProviderRepository extends JpaRepository<Provider, String> {
 
     Optional<Provider> findByIdNumber(String personId);
 
-    Optional<Provider> findByActiveTrueAndCompany_IdNumber(String companyId);
+    Optional<Provider> findByActiveTrueAndNitCompany(String companyId);
 
 }

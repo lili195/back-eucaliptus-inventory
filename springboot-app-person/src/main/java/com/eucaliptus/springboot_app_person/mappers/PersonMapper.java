@@ -1,9 +1,7 @@
 package com.eucaliptus.springboot_app_person.mappers;
 
 import com.eucaliptus.springboot_app_person.dtos.PersonDTO;
-import com.eucaliptus.springboot_app_person.model.DocumentType;
 import com.eucaliptus.springboot_app_person.model.Person;
-import com.eucaliptus.springboot_app_person.model.Role;
 
 public class PersonMapper {
 

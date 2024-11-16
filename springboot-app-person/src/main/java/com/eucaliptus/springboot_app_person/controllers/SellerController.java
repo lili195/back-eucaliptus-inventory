@@ -5,7 +5,6 @@ import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
 import com.eucaliptus.springboot_app_person.dtos.UpdateUserDTO;
 import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.enums.EnumRole;
-import com.eucaliptus.springboot_app_person.mappers.PersonMapper;
 import com.eucaliptus.springboot_app_person.mappers.SellerMapper;
 import com.eucaliptus.springboot_app_person.model.*;
 import com.eucaliptus.springboot_app_person.security.JwtTokenUtil;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,8 +23,6 @@ public class SellerController {
 
     @Autowired
     private SellerService sellerService;
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private PersonService personService;
     @Autowired
