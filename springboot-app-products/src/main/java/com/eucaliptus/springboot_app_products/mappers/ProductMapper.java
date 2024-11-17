@@ -9,7 +9,7 @@ public class ProductMapper {
     public static Product productDTOToProduct(ProductDTO productDTO, Unit unit) {
         Product product = new Product();
         product.setIdProduct(productDTO.getIdProduct());
-        product.setName(productDTO.getProductName());
+        product.setProductName(productDTO.getProductName());
         product.setBrand(productDTO.getBrand());
         product.setCategory(productDTO.getCategory());
         product.setUse(productDTO.getUse());
@@ -25,7 +25,7 @@ public class ProductMapper {
     public static ProductDTO productToProductDTO(Product product) {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setIdProduct(product.getIdProduct());
-        productDTO.setProductName(product.getName());
+        productDTO.setProductName(product.getProductName());
         productDTO.setBrand(product.getBrand());
         productDTO.setCategory(product.getCategory());
         productDTO.setUse(product.getUse());

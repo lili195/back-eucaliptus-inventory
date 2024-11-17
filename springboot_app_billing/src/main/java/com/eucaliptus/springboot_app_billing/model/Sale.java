@@ -21,7 +21,7 @@ public class Sale {
     @Column(name = "id_product", nullable = false)
     private String idProduct;  // Llave foránea de otro microservicio
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantityAvailableBatch", nullable = false)
     private Integer quantity;
 
     @Column(name = "unit_price", nullable = false)

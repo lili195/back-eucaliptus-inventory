@@ -24,9 +24,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     List<Product> findByIdProviderAndActiveTrue(String idProvider);
 
-    boolean existsByName(String productName);
+    boolean existsByProductName(String productName);
 
-    Optional<Product> findByName(String name);
+    Optional<Product> findByProductName(String name);
 
 
     public default List<ProductExpiringSoonDTO> findProductsExpiringSoon() {
@@ -36,7 +36,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             ProductExpiringSoonDTO dto = new ProductExpiringSoonDTO();
             dto.setIdProduct(rs.getString("id_product"));
             dto.setProductName(rs.getString("product_name"));
-            dto.setQuantity(rs.getInt("quantity"));
+            dto.setQuantity(rs.getInt("quantityAvailableBatch"));
             dto.setDueDate(rs.getDate("due_date"));
             return dto;
         });

@@ -9,7 +9,7 @@ public class UnitMapper {
         Unit unit = new Unit();
         unit.setIdUnit(unitDTO.getIdUnit());
         unit.setUnitName(unitDTO.getUnitName().toUpperCase());
-        unit.setDescription(unitDTO.getDescription().toUpperCase());
+        unit.setUnitDescription(unitDTO.getDescription().toUpperCase());
         return unit;
     }
 
@@ -17,7 +17,7 @@ public class UnitMapper {
         UnitDTO unitDTO = new UnitDTO();
         unitDTO.setIdUnit(unit.getIdUnit());
         unitDTO.setUnitName(unit.getUnitName());
-        unitDTO.setDescription(unit.getDescription());
+        unitDTO.setDescription(unit.getUnitDescription());
         return unitDTO;
     }
 

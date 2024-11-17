@@ -35,7 +35,7 @@ public class ProductService {
     }
 
     public Optional<Product> getProductByName(String name) {
-        return productRepository.findByName(name);
+        return productRepository.findByProductName(name);
     }
 
     public boolean existsByIdProduct(String id) {
@@ -43,7 +43,7 @@ public class ProductService {
     }
 
     public boolean existsByNameProduct(String productName) {
-        return productRepository.existsByName(productName);
+        return productRepository.existsByProductName(productName);
     }
 
     public boolean existsProviderId(String  providerId, String token) {
@@ -68,7 +68,7 @@ public class ProductService {
 
     public Optional<Product> updateProduct(String id, Product productDetails) {
         return productRepository.findByIdProduct(id).map(product -> {
-            product.setName(productDetails.getName());
+            product.setProductName(productDetails.getProductName());
             product.setBrand(productDetails.getBrand());
             product.setCategory(productDetails.getCategory());
             product.setUse(productDetails.getUse());

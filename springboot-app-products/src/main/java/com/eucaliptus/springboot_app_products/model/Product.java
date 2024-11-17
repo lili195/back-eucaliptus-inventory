@@ -18,29 +18,29 @@ public class Product {
     @Column(name = "id_product")
     private String idProduct;
 
-    @Column(name = "product_name", nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "id_unit", referencedColumnName = "id_unit")
+    private Unit unit;
 
-    @Column(name = "brand")
+    @Column(name = "product_name", nullable = false)
+    private String productName;
+
+    @Column(name = "brand", nullable = false)
     private String brand;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "category")
+    @Column(name = "category", nullable = false)
     private EnumCategory category;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "use")
+    @Column(name = "use", nullable = false)
     private EnumUse use;
-
-    @Column(name = "id_provider")
-    private String idProvider;
 
     @Column(name = "description")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "id_unit", referencedColumnName = "id_unit")
-    private Unit unit;
+    @Column(name = "id_provider")
+    private String idProvider;
 
     @Column(name = "minimum_product_amount")
     private Integer minimumProductAmount;
@@ -53,7 +53,7 @@ public class Product {
 
     public Product(String idProduct, String productName, String brand, String category, String use, String idProvider, String description, Unit unit, Integer minimumProductAmount, Integer maximumProductAmount) {
         this.idProduct = idProduct;
-        this.name = productName;
+        this.productName = productName;
         this.brand = brand;
         this.category = EnumCategory.valueOf(category);
         this.use = EnumUse.valueOf(use);

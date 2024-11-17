@@ -22,5 +22,5 @@ public interface UnitRepository extends JpaRepository<Unit, Long> {
 
     Optional<Unit> findByUnitName(String name);
 
-    Optional<Unit> findByUnitNameIgnoreCaseAndDescriptionIgnoreCase(String unitName, String description);
+    Optional<Unit> findByUnitNameIgnoreCaseAndUnitDescriptionIgnoreCase(String unitName, String description);
 }

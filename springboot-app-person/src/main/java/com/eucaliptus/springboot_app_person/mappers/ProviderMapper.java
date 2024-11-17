@@ -3,7 +3,6 @@ package com.eucaliptus.springboot_app_person.mappers;
 import com.eucaliptus.springboot_app_person.dtos.CompanyDTO;
 import com.eucaliptus.springboot_app_person.dtos.PersonDTO;
 import com.eucaliptus.springboot_app_person.dtos.ProviderDTO;
-import com.eucaliptus.springboot_app_person.enums.EnumDocumentType;
 import com.eucaliptus.springboot_app_person.enums.EnumPersonType;
 import com.eucaliptus.springboot_app_person.model.*;
 
@@ -15,12 +14,6 @@ public class ProviderMapper {
         provider.setBankName(providerDTO.getBankName());
         provider.setBankAccountNumber(providerDTO.getBankAccountNumber());
         provider.setPersonType(EnumPersonType.valueOf(providerDTO.getPersonType()));
-        if (providerDTO.getCompanyDTO() != null) {
-            provider.setNitCompany(providerDTO.getCompanyDTO().getNit());
-            provider.setNameCompany(providerDTO.getCompanyDTO().getCompanyName());
-            provider.setEmailCompany(providerDTO.getCompanyDTO().getCompanyEmail());
-            provider.setPhoneNumberCompany(providerDTO.getCompanyDTO().getCompanyPhoneNumber());
-        }
         return provider;
     }
 
@@ -31,13 +24,10 @@ public class ProviderMapper {
         providerDTO.setBankName(provider.getBankName());
         providerDTO.setBankAccountNumber(provider.getBankAccountNumber());
         providerDTO.setPersonType(provider.getPersonType().name());
-        providerDTO.setCompanyDTO(new CompanyDTO(
-                provider.getNitCompany(),
-                provider.getNameCompany(),
-                provider.getPhoneNumberCompany(),
-                provider.getEmailCompany(),
-                provider.getAddressCompany()
-        ));
+        if (provider.getCompany() != null) {
+            CompanyDTO companyDTO = CompanyMapper.companyToCompanyDTO(provider.getCompany());
+            providerDTO.setCompanyDTO(companyDTO);
+        }
         return providerDTO;
     }
 }

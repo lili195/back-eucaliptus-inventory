@@ -12,7 +12,6 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "providers")
-//@DiscriminatorValue("ROLE_PROVIDER")
 public class Provider extends Person{
 
     @Column(name = "bank_name")
@@ -25,33 +24,17 @@ public class Provider extends Person{
     @Enumerated(EnumType.STRING)
     private EnumPersonType personType;
 
-    @Column(name = "nit_company")
-    private String nitCompany;
-
-    @Column(name = "name_company")
-    private String nameCompany;
-
-    @Column(name = "email_company")
-    private String emailCompany;
-
-    @Column(name = "phone_number_company")
-    private String phoneNumberCompany;
-
-    @Column(name = "address_company")
-    private String addressCompany;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "nit_company", referencedColumnName = "nit_company")
+    private Company company;
 
     public Provider (String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType,
-                     String bankName, String bankAccountNumber, EnumPersonType personType,
-                     String nitCompany, String nameCompany, String emailCompany, String phoneNumberCompany, String addressCompany){
+                     String bankName, String bankAccountNumber, EnumPersonType personType, Company company){
         super(idNumber, firstName, lastName, email, address, phoneNumber, documentType, EnumRole.ROLE_PROVIDER);
         this.bankName = bankName;
         this.bankAccountNumber = bankAccountNumber;
         this.personType = personType;
-        this.nitCompany = nitCompany;
-        this.nameCompany = nameCompany;
-        this.emailCompany = emailCompany;
-        this.phoneNumberCompany = phoneNumberCompany;
-        this.addressCompany = addressCompany;
+        this.company = company;
     }
 
     public Provider (String idNumber, String firstName, String lastName, String email, String address, String phoneNumber, DocumentType documentType){

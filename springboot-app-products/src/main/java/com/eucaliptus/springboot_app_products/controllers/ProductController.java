@@ -41,7 +41,7 @@ public class ProductController {
             return new ResponseEntity<>(productService.getAllActiveProducts().stream().
                     map(ProductMapper::productToProductDTO).collect(Collectors.toList()), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new com.eucaliptus.springboot_app_products.dto.Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -53,7 +53,7 @@ public class ProductController {
                 return new ResponseEntity<>(new Message("Producto no encontrado"), HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(ProductMapper.productToProductDTO(productService.getProductById(id).get()), HttpStatus.OK);
             } catch (Exception e){
-                return new ResponseEntity<>(new com.eucaliptus.springboot_app_products.dto.Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
     }
 
@@ -65,7 +65,7 @@ public class ProductController {
                 return new ResponseEntity<>(new Message("Producto no encontrado"), HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(ProductMapper.productToProductDTO(productService.getProductByName(productName).get()), HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>(new com.eucaliptus.springboot_app_products.dto.Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -76,10 +76,9 @@ public class ProductController {
             return new ResponseEntity<>(productService.getProductsByIdProvider(providerId).stream().
                     map(ProductMapper::productToProductDTO).collect(Collectors.toList()), HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>(new com.eucaliptus.springboot_app_products.dto.Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @PostMapping("/addProduct")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -97,7 +96,6 @@ public class ProductController {
 
             Product product = ProductMapper.productDTOToProduct(productDTO, unit);
             product = productService.saveProduct(product);
-            Stock stock = stockService.saveStock(new Stock(product, 0));
             return new ResponseEntity<>(ProductMapper.productToProductDTO(product), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

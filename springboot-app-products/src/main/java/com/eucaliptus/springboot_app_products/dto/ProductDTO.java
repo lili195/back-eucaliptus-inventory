@@ -22,4 +22,5 @@ public class ProductDTO {
     private UnitDTO unitDTO;
     private Integer minimumProductAmount;
     private Integer maximumProductAmount;
+    private boolean active;
 }

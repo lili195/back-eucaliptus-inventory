@@ -20,11 +20,11 @@ public class Unit {
     @Column(name = "unit_name", nullable = false)
     private String unitName;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "unit_description")
+    private String unitDescription;
 
-    public Unit(String unitName, String description) {
+    public Unit(String unitName, String unitDescription) {
         this.unitName = unitName;
-        this.description = description;
+        this.unitDescription = unitDescription;
     }
 }

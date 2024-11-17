@@ -24,7 +24,7 @@ public class UnitService {
     }
 
     public List<String> getDescriptionsByUnitName(String unitName){
-        return unitRepository.findDistinctByUnitName(unitName).stream().map(Unit::getDescription).collect(Collectors.toList());
+        return unitRepository.findDistinctByUnitName(unitName).stream().map(Unit::getUnitDescription).collect(Collectors.toList());
     }
 
     public Optional<Unit> getUnitById(int idUnit) {
@@ -36,7 +36,7 @@ public class UnitService {
     }
 
     public Optional<Unit> getUnitByNameAndDescription(String name, String description) {
-        return unitRepository.findByUnitNameIgnoreCaseAndDescriptionIgnoreCase(name, description);
+        return unitRepository.findByUnitNameIgnoreCaseAndUnitDescriptionIgnoreCase(name, description);
     }
 
     public Unit saveUnit(Unit unit) {
@@ -46,7 +46,7 @@ public class UnitService {
     public Optional<Unit> updateUnit(Long idUnit, Unit unitDetails) {
         return unitRepository.findById(idUnit).map(unit -> {
             unit.setUnitName(unitDetails.getUnitName());
-            unit.setDescription(unitDetails.getDescription());
+            unit.setUnitDescription(unitDetails.getUnitDescription());
             return unitRepository.save(unit);
         });
     }

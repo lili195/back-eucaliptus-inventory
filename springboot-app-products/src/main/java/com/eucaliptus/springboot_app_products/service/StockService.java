@@ -1,7 +1,11 @@
 package com.eucaliptus.springboot_app_products.service;
 
+import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
+import com.eucaliptus.springboot_app_products.mappers.StockMapper;
+import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.repository.StockRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,51 +17,39 @@ public class StockService {
 
     @Autowired
     private StockRepository stockRepository;
+    @Autowired
+    private ProductService productService;
 
-    public List<Stock> getAllStocks() {
-        return stockRepository.findAll();
-    }
-
-    public Optional<Stock> getStockById(Long idStock) {
-        return stockRepository.findById(idStock);
+    public List<Stock> getStocksAvailable(){
+        return stockRepository.findLatestStockByProduct();
     }
 
     public Optional<Stock> getStockByProductId(String productId) {
-        return stockRepository.findByProduct_IdProduct(productId);
+        return stockRepository.findFirstByProduct_IdProductOrderByModificationDateStockDesc(productId);
     }
 
     public Stock saveStock(Stock stock) {
         return stockRepository.save(stock);
     }
 
-    public Stock updateStock(Long id, Stock stockDetails) {
-        Optional<Stock> existingStock = stockRepository.findById(id);
-
-        if (existingStock.isPresent()) {
-            Stock stockToUpdate = existingStock.get();
-            stockToUpdate.setQuantityAvailable(stockDetails.getQuantityAvailable()); // Actualiza los campos que necesites
-            stockToUpdate.setProduct(stockDetails.getProduct());   // Otros campos...
-
-            return stockRepository.save(stockToUpdate);
-        } else {
-            throw new RuntimeException("Stock no encontrado");
+    @Transactional
+    public boolean updateStocks(List<NewBatchDTO> batches){
+        for (NewBatchDTO batch : batches) {
+            Optional<Product> opProduct = productService.getProductById(batch.getIdProduct());
+            if (opProduct.isEmpty())
+                throw new IllegalArgumentException("Producto no encontrado: " + batch.getIdProduct());
+            Stock stock = StockMapper.newBatchDTOToStock(batch);
+            stock.setProduct(opProduct.get());
+            Optional<Stock> existStock = getStockByProductId(batch.getIdProduct());
+            int quantity = (existStock.isEmpty()) ?
+                    batch.getQuantityPurchased():
+                    existStock.get().getQuantityAvailable() + batch.getQuantityPurchased();
+            stock.setQuantityAvailable(quantity);
+            saveStock(stock);
+            stockRepository.save(stock);
         }
+        return true;
     }
 
 
-    public boolean existsByIdStock(Long idStock) {
-        return stockRepository.existsById(idStock);
-    }
-
-    public boolean existsById(Long id) {
-        return stockRepository.existsById(id); // Asume que tienes un repositorio de stock
-    }
-
-
-    public boolean deleteStock(Long idStock) {
-        return stockRepository.findById(idStock).map(stock -> {
-            stockRepository.delete(stock);
-            return true;
-        }).orElse(false);
-    }
 }

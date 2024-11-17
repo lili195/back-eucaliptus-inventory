@@ -1,25 +1,41 @@
 package com.eucaliptus.springboot_app_products.mappers;
 
-import com.eucaliptus.springboot_app_person.mappers.ProviderMapper;
+import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
 import com.eucaliptus.springboot_app_products.dto.StockDTO;
-import com.eucaliptus.springboot_app_products.model.Product;
-import com.eucaliptus.springboot_app_products.model.ProductDetail;
 import com.eucaliptus.springboot_app_products.model.Stock;
+
+import java.util.Date;
 
 public class StockMapper {
 
     public static Stock stockDTOToStock(StockDTO stockDTO) {
         Stock stock = new Stock();
         stock.setIdStock(stockDTO.getIdStock());
+        stock.setIdPurchaseDetail(stockDTO.getIdPurchaseDetail());
+        stock.setIdSaleDetail(stockDTO.getIdSaleDetail());
         stock.setQuantityAvailable(stockDTO.getQuantityAvailable());
+        stock.setProductSalePrice(stockDTO.getProductSalePrice());
+        stock.setProductSalePriceWithoutIva(stock.getProductSalePriceWithoutIva());
+        stock.setModificationDateStock(stock.getModificationDateStock());
+        return stock;
+    }
+
+    public static Stock newBatchDTOToStock(NewBatchDTO newBatchDTO) {
+        Stock stock = new Stock();
+        stock.setIdPurchaseDetail(newBatchDTO.getIdPurchaseDetail());
+        stock.setProductSalePrice(newBatchDTO.getSalePrice());
+        stock.setProductSalePriceWithoutIva(newBatchDTO.getSalePriceWithoutIva());
+        stock.setModificationDateStock(new Date());
         return stock;
     }
 
     public static StockDTO stockToStockDTO(Stock stock) {
         StockDTO stockDTO = new StockDTO();
-        stockDTO.setIdStock(stock.getIdStock());
         stockDTO.setProductDTO(ProductMapper.productToProductDTO(stock.getProduct()));
         stockDTO.setQuantityAvailable(stock.getQuantityAvailable());
+        stockDTO.setProductSalePrice(stock.getProductSalePrice());
+        stockDTO.setProductSalePriceWithoutIVA(stock.getProductSalePriceWithoutIva());
         return stockDTO;
     }
+
 }
