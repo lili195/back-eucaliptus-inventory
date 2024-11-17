@@ -1,6 +1,7 @@
 package com.eucaliptus.springboot_app_products.mappers;
 
 import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
+import com.eucaliptus.springboot_app_products.dto.SaleDetailDTO;
 import com.eucaliptus.springboot_app_products.dto.StockDTO;
 import com.eucaliptus.springboot_app_products.model.Stock;
 
@@ -25,6 +26,15 @@ public class StockMapper {
         stock.setIdPurchaseDetail(newBatchDTO.getIdPurchaseDetail());
         stock.setProductSalePrice(newBatchDTO.getSalePrice());
         stock.setProductSalePriceWithoutIva(newBatchDTO.getSalePriceWithoutIva());
+        stock.setModificationDateStock(new Date());
+        return stock;
+    }
+
+    public static Stock SaleDetailDTOToStock(SaleDetailDTO saleDetailDTO) {
+        Stock stock = new Stock();
+        stock.setIdSaleDetail(saleDetailDTO.getIdSaleDetail());
+        stock.setProductSalePrice(saleDetailDTO.getSalePrice());
+        stock.setProductSalePriceWithoutIva(saleDetailDTO.getSalePriceWithoutIva());
         stock.setModificationDateStock(new Date());
         return stock;
     }

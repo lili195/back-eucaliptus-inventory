@@ -9,6 +9,7 @@ public class ServicesUri {
 
     public static String AUTH_SERVICE;
     public static String PERSON_SERVICE;
+    public static String PRODUCT_SERVICE;
     public static String FRONT_URL;
 
     @Value("${services.authentication}")
@@ -20,10 +21,14 @@ public class ServicesUri {
     @Value("${services.person}")
     private String person;
 
+    @Value("${services.product}")
+    private String product;
+
     @PostConstruct
     public void init() {
         AUTH_SERVICE = authentication;
         PERSON_SERVICE = person;
+        PRODUCT_SERVICE = product;
         FRONT_URL = front;
     }
 

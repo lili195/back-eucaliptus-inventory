@@ -10,25 +10,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "clients")
-
 public class Client {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_client")
-    private Integer idClient;
+    @Column(name = "id_client", nullable = false)
+    private String idClient;
 
     @Column(name = "name_client", nullable = false)
     private String nameClient;
 
-    @Column(name = "lastname_client", nullable = false)
-    private String lastnameClient;
-
-    @Column(name = "email", nullable = false)
-    private String email;
-
-    public Client(String nameClient, String lastnameClient, String email) {
-        this.nameClient = nameClient;
-        this.lastnameClient = lastnameClient;
-        this.email = email;
-    }
+    @Column(name = "email_client")
+    private String emailClient;
 }

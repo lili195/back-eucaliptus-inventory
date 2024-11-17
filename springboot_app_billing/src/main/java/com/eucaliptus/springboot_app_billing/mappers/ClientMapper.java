@@ -9,8 +9,7 @@ public class ClientMapper {
         Client client = new Client();
         client.setIdClient(clientDTO.getIdClient());
         client.setNameClient(clientDTO.getNameClient());
-        client.setLastnameClient(clientDTO.getLastnameClient());
-        client.setEmail(clientDTO.getEmail());
+        client.setEmailClient(clientDTO.getEmail());
         return client;
     }
 
@@ -18,8 +17,7 @@ public class ClientMapper {
         ClientDTO clientDTO = new ClientDTO();
         clientDTO.setIdClient(client.getIdClient());
         clientDTO.setNameClient(client.getNameClient());
-        clientDTO.setLastnameClient(client.getLastnameClient());
-        clientDTO.setEmail(client.getEmail());
+        clientDTO.setEmail(client.getEmailClient());
         return clientDTO;
     }
 }

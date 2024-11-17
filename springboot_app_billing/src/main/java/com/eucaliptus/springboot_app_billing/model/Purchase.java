@@ -13,28 +13,24 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "sales")
-public class Sale {
+@Table(name = "purchases")
+public class Purchase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_sale")
-    private int idSale;
+    @Column(name = "id_purchase")
+    private int idPurchase;
 
-    @Column(name = "id_seller", nullable = false)
-    private String idSeller;
-
-    @ManyToOne
-    @JoinColumn(name = "id_client", referencedColumnName = "id_client", nullable = false)
-    private Client client;
+    @Column(name = "id_provider", nullable = false)
+    private String idProvider;
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "date_sale", nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
-    private Date saleDate;
+    @Column(name = "purchase_sale", nullable = false, columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Date purchaseDate;
 
-    @Column(name = "total_sale", nullable = false)
-    private Double totalSale;
+    @Column(name = "total_purchase", nullable = false)
+    private Double totalPurchase;
 
 }

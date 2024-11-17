@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/products/details")
 public class ProductDetailController {
-
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private BatchService batchService;
-    @Autowired
-    private StockService stockService;
-    @Autowired
-    private PurchaseService purchaseService;
-
+//
+//    @Autowired
+//    private ProductService productService;
+//    @Autowired
+//    private BatchService batchService;
+//    @Autowired
+//    private StockService stockService;
+//    @Autowired
+//    private PurchaseService purchaseService;
+//
 //    @GetMapping("/all")
 //    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
 //    public ResponseEntity<List<ProductDetailDTO>> getAllProductDetails() {

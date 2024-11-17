@@ -62,7 +62,7 @@ public class AuthController {
             User user = userService.getByUserName(username).get();
             String token = jwtProvider.generateToken(loginUser.getUsername(), user.getRole(), user.getEmail());
             Claims claims = jwtProvider.getAllClaims(token);
-            TokenDTO tokenDTO = new TokenDTO(token, claims.get("role", String.class), username, claims.get("email", String.class));
+            TokenDTO tokenDTO = new TokenDTO(token, claims.get("role", String.class), username, claims.get("emailClient", String.class));
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new Message("Credenciales invalidas"), HttpStatus.BAD_REQUEST);
@@ -73,7 +73,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> addSeller(@Valid @RequestBody UserDTO userDTO){
         if (userService.getByEmail(userDTO.getEmail()).isPresent())
-            return new ResponseEntity<>(new Message("El email ya existe"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("El emailClient ya existe"), HttpStatus.BAD_REQUEST);
         Role role = roleService.save(new Role(RoleList.ROLE_SELLER));;
         User userEntity = new User(userDTO.getUsername(),
                 userDTO.getEmail(),
@@ -156,7 +156,7 @@ public class AuthController {
             recoveryCodeService.deleteExpiratedCodes();
             Optional<User> opUser = userService.getByEmail(email);
             if(opUser.isEmpty())
-                return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Message("Este emailClient no es no esta registrado"), HttpStatus.NOT_FOUND);
             User user = opUser.get();
             int code = recoveryCodeService.generateCode();
             LocalDateTime expirationDate = recoveryCodeService.getExpirationDate();
@@ -175,7 +175,7 @@ public class AuthController {
             recoveryCodeService.deleteExpiratedCodes();
             Optional<User> opUser = userService.getByEmail(recoveryCodeDTO.getEmail());
             if(opUser.isEmpty())
-                return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Message("Este emailClient no es no esta registrado"), HttpStatus.NOT_FOUND);
             User user = opUser.get();
             if (!recoveryCodeService.existsByCodeAndUser(recoveryCodeDTO.getCode(), user.getId()))
                 return new ResponseEntity<>(new Message("Codigo no valido"), HttpStatus.BAD_REQUEST);
@@ -194,7 +194,7 @@ public class AuthController {
         try{
             Optional<User> opUser = userService.getByEmail(recoveryPasswordDTO.getEmail());
             if(opUser.isEmpty())
-                return new ResponseEntity<>(new Message("Este email no es no esta registrado"), HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(new Message("Este emailClient no es no esta registrado"), HttpStatus.NOT_FOUND);
             User user = opUser.get();
             if (!recoveryCodeService.existsByCodeAndUser(recoveryPasswordDTO.getCode(), user.getId()))
                 return new ResponseEntity<>(new Message("Codigo no valido"), HttpStatus.BAD_REQUEST);

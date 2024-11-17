@@ -7,12 +7,8 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class ClientDTO {
-
-    private Integer idClient;
+    private String idClient;
     private String nameClient;
-    private String lastnameClient;
     private String email;
-
 }

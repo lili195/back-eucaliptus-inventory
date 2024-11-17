@@ -9,11 +9,12 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-public class ReduceStockDTO {
+public class SaleDetailDTO {
+    private Long idSaleDetail;
+    private Long idSale;
     private String idProduct;
     private Date batch;
-    private int idSaleDetail;
     private int quantitySold;
-    private float salePrice;
-    private float salePriceWithoutIva;
+    private Double salePrice;
+    private Double salePriceWithoutIva;
 }

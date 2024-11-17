@@ -5,9 +5,9 @@ import com.eucaliptus.springboot_app_products.mappers.StockMapper;
 import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.repository.StockRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,10 +46,11 @@ public class StockService {
                     existStock.get().getQuantityAvailable() + batch.getQuantityPurchased();
             stock.setQuantityAvailable(quantity);
             saveStock(stock);
-            stockRepository.save(stock);
         }
         return true;
     }
+
+
 
 
 }

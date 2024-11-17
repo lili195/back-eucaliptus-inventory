@@ -2,7 +2,6 @@ package com.eucaliptus.springboot_app_products.service;
 
 import com.eucaliptus.springboot_app_products.dto.Message;
 import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
-import com.eucaliptus.springboot_app_products.dto.ProductDetailDTO;
 import com.eucaliptus.springboot_app_products.model.Batch;
 import com.eucaliptus.springboot_app_products.repository.BatchRepository;
 import jakarta.transaction.Transactional;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -26,6 +26,8 @@ public class BatchService {
     }
 
     public Batch saveBatch(Batch batch) {
+        batch.setDueDate(this.convertToUTC(batch.getDueDate()));
+        batch.setBatch(this.convertToUTC(batch.getBatch()));
         return batchRepository.save(batch);
     }
 
@@ -34,6 +36,14 @@ public class BatchService {
             batchDetails.setQuantityAvailableBatch(quantityAvailable);
             return batchRepository.save(batchDetails);
         });
+    }
+
+    public Optional<Batch> findByIdProductAndBatch(String idProduct, Date batch) {
+        return batchRepository.findByIdProductAndBatch(idProduct, batch);
+    }
+
+    public List<Batch> getFirstAvailableBatch(String idProduct) {
+        return batchRepository.findAllAvailableBatchByProductId(idProduct);
     }
 
     public boolean existsByIdProductAndBatch(String idProduct, Date batch) {
@@ -86,5 +96,11 @@ public class BatchService {
             if (!setProductId.add(batch.getIdProduct()+batch.getBatchPurchase()))
                 return true;
         return false;
+    }
+
+    public Date convertToUTC(Date date) {
+        if (date == null)
+            return null;
+        return Date.from(date.toInstant().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toInstant());
     }
 }
