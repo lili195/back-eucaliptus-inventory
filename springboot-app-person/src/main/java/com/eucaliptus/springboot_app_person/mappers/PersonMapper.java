@@ -23,6 +23,7 @@ public class PersonMapper {
         personDTO.setFirstName(person.getFirstName());
         personDTO.setLastName(person.getLastName());
         personDTO.setEmail(person.getEmail());
+        personDTO.setAddress(person.getAddress());
         personDTO.setPhoneNumber(person.getPhoneNumber());
         personDTO.setDocumentType(person.getDocumentType().getNameType().name());
         return personDTO;
