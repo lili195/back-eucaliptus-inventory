@@ -17,6 +17,7 @@ public class StockDTO {
     private Integer quantityAvailable;
     private Double productSalePrice;
     private Double productSalePriceWithoutIVA;
+    private int iva;
     private Date modificationDate;
 }
 

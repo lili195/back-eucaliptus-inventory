@@ -45,7 +45,13 @@ public class StockMapper {
         stockDTO.setQuantityAvailable(stock.getQuantityAvailable());
         stockDTO.setProductSalePrice(stock.getProductSalePrice());
         stockDTO.setProductSalePriceWithoutIVA(stock.getProductSalePriceWithoutIva());
+        stockDTO.setIva(calculateIva(stock.getProductSalePrice(), stock.getProductSalePriceWithoutIva()));
         return stockDTO;
     }
+
+    private static Integer calculateIva(Double priceWithIva, Double priceWithoutIva) {
+        return (int) Math.round((priceWithIva - priceWithoutIva) / priceWithoutIva * 100);
+    }
+
 
 }
