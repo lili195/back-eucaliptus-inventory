@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/eureka-server/pom.xml" />
         <option value="$PROJECT_DIR$/springboot-app-products/pom.xml" />
         <option value="$PROJECT_DIR$/springboot_app_billing/pom.xml" />
+        <option value="$PROJECT_DIR$/springboot-app-notifications/pom.xml" />
       </list>
     </option>
   </component>
