@@ -12,7 +12,7 @@ public interface SaleRepository extends JpaRepository<Sale, Integer> {
 
     List<Sale> findBySaleDate(Date billDate);
 
-        List<Sale> findByClient_IdClient(String idClient);
+    List<Sale> findByClient_IdClient(String idClient);
 
     boolean existsByClient_IdClientAndSaleDate(String idClient, Date billDate);
 

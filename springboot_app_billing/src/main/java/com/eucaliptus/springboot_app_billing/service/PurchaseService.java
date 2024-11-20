@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,10 @@ public class PurchaseService {
 
     public Optional<Purchase> getById(int id) {
         return purchaseRepository.findById(id);
+    }
+
+    public List<Purchase> getPurchasesByDate(Date date){
+        return purchaseRepository.findByPurchaseDate(date);
     }
 
     public List<Purchase> getAll() {

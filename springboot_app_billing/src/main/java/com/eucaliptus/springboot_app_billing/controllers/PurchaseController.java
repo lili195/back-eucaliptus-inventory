@@ -1,10 +1,10 @@
 package com.eucaliptus.springboot_app_billing.controllers;
 
+import com.eucaliptus.springboot_app_billing.dto.DatesDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseMapper;
-import com.eucaliptus.springboot_app_billing.model.Purchase;
 import com.eucaliptus.springboot_app_billing.service.ProductService;
 import com.eucaliptus.springboot_app_billing.service.PurchaseDetailService;
 import com.eucaliptus.springboot_app_billing.service.PurchaseService;
@@ -43,6 +43,22 @@ public class PurchaseController {
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/getHistoryPurchase")
+    public ResponseEntity<Object> getHistoryPurchase(@RequestBody DatesDTO date, HttpServletRequest request) {
+        try {
+            List<PurchaseDTO> purchases = purchaseService.getPurchasesByDate(date.getStartDate()).stream().map(PurchaseMapper::purchaseToPurchaseDTO).toList();
+            for (PurchaseDTO purchaseDTO : purchases) {
+                purchaseDTO.setPurchaseDetails(purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
+                        map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList());
+            }
+            purchases = productService.getProductsFromPurchase(purchases, productService.getTokenByRequest(request));
+            return new ResponseEntity<>(purchases, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);

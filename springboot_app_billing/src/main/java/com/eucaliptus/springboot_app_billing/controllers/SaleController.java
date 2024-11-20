@@ -45,6 +45,22 @@ public class SaleController {
         }
     }
 
+    @PostMapping("/getHistorySale")
+    public ResponseEntity<Object> getHistorySale(@RequestBody DatesDTO date, HttpServletRequest request) {
+        try {
+            List<SaleDTO> sales = saleService.getSalesByDate(date.getStartDate()).stream().map(SaleMapper::saleToSaleDTO).toList();
+            for (SaleDTO saleDTO : sales) {
+                saleDTO.setSaleDetails(saleDetailService.getSalesBySale(saleDTO.getIdSale()).stream().
+                        map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList());
+            }
+            sales = productService.getProductsFromSale(sales, productService.getTokenByRequest(request));
+            return new ResponseEntity<>(sales, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/getProductsSale")
     public ResponseEntity<Object> getProductsSale(@RequestBody DatesDTO dates) {
         try {
