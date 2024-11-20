@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,9 +53,26 @@ public class ProductController {
             if (!productService.existsByIdProduct(id))
                 return new ResponseEntity<>(new Message("Producto no encontrado"), HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>(ProductMapper.productToProductDTO(productService.getProductById(id).get()), HttpStatus.OK);
-            } catch (Exception e){
-                return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getProductsById")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> getProductsById(@RequestBody List<String> ids) {
+        try {
+            List<ProductDTO> productDTOS = new ArrayList<>();
+            for (String id : ids) {
+                Optional<Product> opProduct = productService.getProductById(id);
+                if (opProduct.isEmpty())
+                    return new ResponseEntity<>(new Message("Producto no encontrado"), HttpStatus.BAD_REQUEST);
+                productDTOS.add(ProductMapper.productToProductDTO(opProduct.get()));
             }
+            return new ResponseEntity<>(productDTOS, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("getProductByName/{productName}")
