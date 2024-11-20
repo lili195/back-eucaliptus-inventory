@@ -54,7 +54,7 @@ public class SaleService {
     }
 
     @Transactional
-    public boolean addSale(SaleDTO saleDTO, HttpServletRequest request){
+    public Sale addSale(SaleDTO saleDTO, HttpServletRequest request){
         String sellerId = getIdSeller(getTokenByRequest(request));
         if (sellerId.isEmpty())
             throw new IllegalArgumentException("Vendedor no encontrado");
@@ -74,7 +74,7 @@ public class SaleService {
         }
         if (!updateStock(saleDetailSaved, getTokenByRequest(request)))
             throw new IllegalArgumentException("Error actualizando lotes");
-        return true;
+        return sale;
     }
 
     private String getIdSeller(String token){

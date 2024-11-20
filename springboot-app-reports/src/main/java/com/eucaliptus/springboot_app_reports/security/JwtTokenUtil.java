@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_reports.security;
 
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

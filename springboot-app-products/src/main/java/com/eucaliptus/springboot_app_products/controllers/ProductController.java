@@ -58,7 +58,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/getProductsById")
+    @PostMapping("/getProductsById")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getProductsById(@RequestBody List<String> ids) {
         try {

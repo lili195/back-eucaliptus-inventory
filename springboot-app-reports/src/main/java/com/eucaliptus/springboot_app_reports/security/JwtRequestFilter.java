@@ -1,6 +1,6 @@
 package com.eucaliptus.springboot_app_reports.security;
 
-import com.eucaliptus.springboot_app_products.utlities.ServicesUri;
+import com.eucaliptus.springboot_app_reports.utlities.ServicesUri;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_billing.dto;
 
+import com.eucaliptus.springboot_app_products.dto.ProductDTO;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.Date;
 public class PurchaseDetailDTO {
     private int idPurchaseDetail;
     private String idProduct;
+    private ProductDTO productDTO;
     private Date batchPurchase;
     private int quantityPurchased;
     private Double purchasePrice;

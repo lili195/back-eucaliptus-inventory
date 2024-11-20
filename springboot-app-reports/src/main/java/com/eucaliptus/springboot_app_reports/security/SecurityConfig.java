@@ -1,6 +1,6 @@
 package com.eucaliptus.springboot_app_reports.security;
 
-import com.eucaliptus.springboot_app_products.utlities.ServicesUri;
+import com.eucaliptus.springboot_app_reports.utlities.ServicesUri;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

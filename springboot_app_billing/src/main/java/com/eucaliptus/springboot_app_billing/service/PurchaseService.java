@@ -47,7 +47,7 @@ public class PurchaseService {
     }
 
     @Transactional
-    public boolean saveNewPurchase(PurchaseDTO purchaseDTO, HttpServletRequest request) {
+    public Purchase saveNewPurchase(PurchaseDTO purchaseDTO, HttpServletRequest request) {
         if (!existsProviderId(purchaseDTO.getProviderId(), getTokenByRequest(request)))
             throw new IllegalArgumentException("Este proveedor no existe");
         purchaseDTO.setTotalPurchase(calculateTotal(purchaseDTO.getPurchaseDetails()));
@@ -60,7 +60,7 @@ public class PurchaseService {
         }
         if (!createBatches(purchases, getTokenByRequest(request)))
             throw new IllegalArgumentException("Error al crear los lotes");
-        return true;
+        return purchaseSaved;
     }
 
     public boolean existsProviderId(String  providerId, String token) {

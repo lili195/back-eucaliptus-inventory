@@ -15,6 +15,7 @@ public class PurchaseMapper {
 
     public static PurchaseDTO purchaseToPurchaseDTO(Purchase purchase) {
         PurchaseDTO purchaseDTO = new PurchaseDTO();
+        purchaseDTO.setPurchaseId(purchase.getIdPurchase());
         purchaseDTO.setProviderId(purchase.getIdProvider());
         purchaseDTO.setPurchaseDate(purchase.getPurchaseDate());
         purchaseDTO.setTotalPurchase(purchase.getTotalPurchase());

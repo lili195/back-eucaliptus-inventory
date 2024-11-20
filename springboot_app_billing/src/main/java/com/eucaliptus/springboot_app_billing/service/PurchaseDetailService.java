@@ -17,6 +17,10 @@ public class PurchaseDetailService {
         return purchaseDetailRepository.findAll();
     }
 
+    public List<PurchaseDetail> findByPurchaseId(Integer purchaseId) {
+        return purchaseDetailRepository.findByPurchase_IdPurchase(purchaseId);
+    }
+
     public PurchaseDetail savePurchaseDetail(PurchaseDetail purchaseDetail) {
         return purchaseDetailRepository.save(purchaseDetail);
     }

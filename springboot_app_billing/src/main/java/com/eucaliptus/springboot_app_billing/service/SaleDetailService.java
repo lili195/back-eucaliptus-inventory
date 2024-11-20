@@ -34,7 +34,8 @@ public class SaleDetailService {
     }
 
     public List<ProductsSaleDTO> getProductsSaleByRangeDate(Date startDate, Date endDate) {
-        return saleDetailRepository.getSalesSummary(dateToLocalDate(startDate), dateToLocalDate(endDate));
+        //return saleDetailRepository.getSalesSummary(dateToLocalDate(startDate), dateToLocalDate(endDate));
+        return saleDetailRepository.getSalesSummary(startDate, endDate);
     }
 
     public LocalDate dateToLocalDate(Date date) {

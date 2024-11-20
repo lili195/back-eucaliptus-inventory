@@ -1,6 +1,6 @@
 package com.eucaliptus.springboot_app_reports.service;
 
-import com.eucaliptus.springboot_app_reports.dto.DatesDTO;
+import com.eucaliptus.springboot_app_billing.dto.DatesDTO;
 import com.eucaliptus.springboot_app_reports.dto.ProductDTO;
 import com.eucaliptus.springboot_app_reports.dto.ProductsSaleDTO;
 import com.eucaliptus.springboot_app_reports.dto.ReportDTO;
@@ -33,7 +33,7 @@ public class ReportService {
         HttpEntity<List<String>> entity = new HttpEntity<>(ids, getHeader(token));
         ResponseEntity<List<ProductDTO>> response = restTemplate.exchange(
                 ServicesUri.PRODUCT_SERVICE + "/products/getProductsById",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 entity,
                 new ParameterizedTypeReference<List<ProductDTO>>() {}
         );
@@ -47,7 +47,7 @@ public class ReportService {
         HttpEntity<DatesDTO> entity = new HttpEntity<>(new DatesDTO(startDate, endDate), getHeader(token));
         ResponseEntity<List<ProductsSaleDTO>> response = restTemplate.exchange(
                 ServicesUri.BILLING_SERVICE + "/billing/sale/getProductsSale",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 entity,
                 new ParameterizedTypeReference<List<ProductsSaleDTO>>() {}
         );

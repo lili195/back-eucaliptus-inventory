@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Date;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -26,6 +26,6 @@ public interface SaleDetailRepository extends JpaRepository<SaleDetail, Integer>
             "JOIN sd.sale s " +
             "WHERE s.saleDate BETWEEN :startDate AND :endDate " +
             "GROUP BY sd.idProduct")
-    List<ProductsSaleDTO> getSalesSummary(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    List<ProductsSaleDTO> getSalesSummary(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

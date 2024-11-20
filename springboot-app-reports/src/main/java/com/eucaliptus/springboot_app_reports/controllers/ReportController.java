@@ -33,7 +33,7 @@ public class ReportController {
         }
     }
 
-    @GetMapping("/range")
+    @GetMapping("/rangeReport")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> rangeReport(@RequestBody DatesDTO dates, HttpServletRequest request) {
         try {

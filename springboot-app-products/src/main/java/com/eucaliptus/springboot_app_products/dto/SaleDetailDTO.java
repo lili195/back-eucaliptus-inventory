@@ -13,6 +13,7 @@ public class SaleDetailDTO {
     private Long idSaleDetail;
     private Long idSale;
     private String idProduct;
+    private ProductDTO productDTO;
     private Date batch;
     private int quantitySold;
     private Double salePrice;
