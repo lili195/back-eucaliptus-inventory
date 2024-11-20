@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/report")
@@ -20,7 +17,7 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @GetMapping("/dailyReport")
+    @PostMapping("/dailyReport")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> dailyReport(@RequestBody DatesDTO dates, HttpServletRequest request) {
         try {
@@ -33,7 +30,7 @@ public class ReportController {
         }
     }
 
-    @GetMapping("/rangeReport")
+    @PostMapping("/rangeReport")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> rangeReport(@RequestBody DatesDTO dates, HttpServletRequest request) {
         try {
