@@ -31,7 +31,12 @@ public class SaleDetailMapper {
         saleDetailDTO.setQuantitySold(saleDetail.getQuantitySold());
         saleDetailDTO.setSalePrice(saleDetail.getSalePrice());
         saleDetailDTO.setSalePriceWithoutIva(saleDetail.getSalePriceWithoutIva());
+        saleDetailDTO.setIva(calculateIva(saleDetail.getSalePrice(), saleDetail.getSalePriceWithoutIva()));
         return saleDetailDTO;
+    }
+
+    private static Integer calculateIva(Double priceWithIva, Double priceWithoutIva) {
+        return (int) Math.round((priceWithIva - priceWithoutIva) / priceWithoutIva * 100);
     }
 
 }

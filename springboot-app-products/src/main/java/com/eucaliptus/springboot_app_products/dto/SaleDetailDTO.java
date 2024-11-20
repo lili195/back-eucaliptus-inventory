@@ -17,5 +17,6 @@ public class SaleDetailDTO {
     private Date batch;
     private int quantitySold;
     private Double salePrice;
+    private int iva;
     private Double salePriceWithoutIva;
 }

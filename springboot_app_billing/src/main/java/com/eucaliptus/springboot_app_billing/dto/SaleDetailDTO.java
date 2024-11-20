@@ -18,4 +18,5 @@ public class SaleDetailDTO {
     private Integer quantitySold;
     private Double salePrice;
     private Double salePriceWithoutIva;
+    private int iva;
 }

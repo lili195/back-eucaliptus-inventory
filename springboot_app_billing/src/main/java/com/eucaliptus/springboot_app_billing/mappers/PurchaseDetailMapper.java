@@ -40,11 +40,16 @@ public class PurchaseDetailMapper {
         purchaseDetailDTO.setPurchasePriceWithoutIva(purchaseDetail.getPurchasePriceWithoutIva());
         purchaseDetailDTO.setSalePrice(purchaseDetail.getSalePrice());
         purchaseDetailDTO.setSalePriceWithoutIva(purchaseDetail.getSalePriceWithoutIva());
+        purchaseDetailDTO.setIva(calculateIva(purchaseDetail.getPurchasePrice(), purchaseDetail.getPurchasePriceWithoutIva()));
         purchaseDetailDTO.setPurchaseDueDate(purchaseDetail.getPurchaseDueDate());
         return purchaseDetailDTO;
     }
 
     private static Double getPriceWithoutIva(Double price, Integer iva) {
         return price / (1.0 + ((double)iva / 100));
+    }
+
+    private static Integer calculateIva(Double priceWithIva, Double priceWithoutIva) {
+        return (int) Math.round((priceWithIva - priceWithoutIva) / priceWithoutIva * 100);
     }
 }
