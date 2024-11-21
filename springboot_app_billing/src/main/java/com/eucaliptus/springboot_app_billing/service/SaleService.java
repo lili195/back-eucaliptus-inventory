@@ -45,7 +45,7 @@ public class SaleService {
         return saleRepository.findBySaleDate(date);
     }
 
-    public Optional<Sale> getBillById(Integer id) {
+    public Optional<Sale> getSaleById(Integer id) {
         return saleRepository.findById(id);
     }
 

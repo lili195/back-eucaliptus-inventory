@@ -5,6 +5,7 @@ import com.eucaliptus.springboot_app_billing.dto.PurchaseDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseMapper;
+import com.eucaliptus.springboot_app_billing.model.Purchase;
 import com.eucaliptus.springboot_app_billing.service.ProductService;
 import com.eucaliptus.springboot_app_billing.service.PurchaseDetailService;
 import com.eucaliptus.springboot_app_billing.service.PurchaseService;
@@ -13,12 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/billing/purchase")
@@ -53,12 +52,30 @@ public class PurchaseController {
     public ResponseEntity<Object> getHistoryPurchase(@RequestBody DatesDTO date, HttpServletRequest request) {
         try {
             List<PurchaseDTO> purchases = purchaseService.getPurchasesByDate(date.getStartDate()).stream().map(PurchaseMapper::purchaseToPurchaseDTO).toList();
-            for (PurchaseDTO purchaseDTO : purchases) {
-                purchaseDTO.setPurchaseDetails(purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
-                        map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList());
-            }
-            purchases = productService.getProductsFromPurchase(purchases, productService.getTokenByRequest(request));
+//            for (PurchaseDTO purchaseDTO : purchases) {
+//                purchaseDTO.setPurchaseDetails(purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
+//                        map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList());
+//            }
+//            purchases = productService.getProductsFromPurchase(purchases, productService.getTokenByRequest(request));
             return new ResponseEntity<>(purchases, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getPurchaseDetails/{idPurchase}")
+    public ResponseEntity<Object> getPurchaseDetails(@PathVariable int idPurchase, HttpServletRequest request) {
+        try {
+            Optional<Purchase> opPurchase = purchaseService.getById(idPurchase);
+            if (opPurchase.isEmpty())
+                return new ResponseEntity<>(new Message("Compra no encontrada"), HttpStatus.BAD_REQUEST);
+            PurchaseDTO purchaseDTO = PurchaseMapper.purchaseToPurchaseDTO(opPurchase.get());
+            List<PurchaseDetailDTO> purchaseDetailDTOS = purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
+                    map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList();
+            purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, productService.getTokenByRequest(request));
+            purchaseDTO.setPurchaseDetails(purchaseDetailDTOS);
+            return new ResponseEntity<>(purchaseDTO, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -5,6 +5,7 @@ import com.eucaliptus.springboot_app_billing.dto.SaleDTO;
 import com.eucaliptus.springboot_app_billing.dto.SaleDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.SaleDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.SaleMapper;
+import com.eucaliptus.springboot_app_billing.model.Sale;
 import com.eucaliptus.springboot_app_billing.service.ProductService;
 import com.eucaliptus.springboot_app_billing.service.SaleDetailService;
 import com.eucaliptus.springboot_app_billing.service.SaleService;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/billing/sale")
@@ -49,12 +51,30 @@ public class SaleController {
     public ResponseEntity<Object> getHistorySale(@RequestBody DatesDTO date, HttpServletRequest request) {
         try {
             List<SaleDTO> sales = saleService.getSalesByDate(date.getStartDate()).stream().map(SaleMapper::saleToSaleDTO).toList();
-            for (SaleDTO saleDTO : sales) {
-                saleDTO.setSaleDetails(saleDetailService.getSalesBySale(saleDTO.getIdSale()).stream().
-                        map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList());
-            }
-            sales = productService.getProductsFromSale(sales, productService.getTokenByRequest(request));
+//            for (SaleDTO saleDTO : sales) {
+//                saleDTO.setSaleDetails(saleDetailService.getSalesBySale(saleDTO.getIdSale()).stream().
+//                        map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList());
+//            }
+//            sales = productService.getProductsFromSale(sales, productService.getTokenByRequest(request));
             return new ResponseEntity<>(sales, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getSaleDetails/{idSale}")
+    public ResponseEntity<Object> getSaleDetails(@PathVariable int idSale, HttpServletRequest request) {
+        try {
+            Optional<Sale> opSale= saleService.getSaleById(idSale);
+            if (opSale.isEmpty())
+                return new ResponseEntity<>(new Message("Venta no encontrada"), HttpStatus.BAD_REQUEST);
+            SaleDTO saleDTO = SaleMapper.saleToSaleDTO(opSale.get());
+            List<SaleDetailDTO> saleDetailDTOS = saleDetailService.getSalesBySale(saleDTO.getIdSale()).stream().
+                    map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList();
+            saleDetailDTOS = productService.getSaleDetails(saleDetailDTOS, productService.getTokenByRequest(request));
+            saleDTO.setSaleDetails(saleDetailDTOS);
+            return new ResponseEntity<>(saleDTO, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
