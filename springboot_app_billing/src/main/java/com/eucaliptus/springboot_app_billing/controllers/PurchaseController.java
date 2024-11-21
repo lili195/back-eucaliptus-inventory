@@ -52,11 +52,6 @@ public class PurchaseController {
     public ResponseEntity<Object> getHistoryPurchase(@RequestBody DatesDTO date, HttpServletRequest request) {
         try {
             List<PurchaseDTO> purchases = purchaseService.getPurchasesByDate(date.getStartDate()).stream().map(PurchaseMapper::purchaseToPurchaseDTO).toList();
-//            for (PurchaseDTO purchaseDTO : purchases) {
-//                purchaseDTO.setPurchaseDetails(purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
-//                        map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList());
-//            }
-//            purchases = productService.getProductsFromPurchase(purchases, productService.getTokenByRequest(request));
             return new ResponseEntity<>(purchases, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
