@@ -5,6 +5,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "client_summary")
 public class Summary {
@@ -12,10 +14,10 @@ public class Summary {
     private Long id = 1L;
 
     @Column(name = "total_sales_income")
-    private double totalSalesIncome;
+    private BigDecimal totalSalesIncome;
 
     @Column(name = "total_purchase_investment")
-    private double totalPurchaseInvestment;
+    private BigDecimal totalPurchaseInvestment;
 
     @Column(name = "total_sales_count")
     private int totalSalesCount;
@@ -32,19 +34,19 @@ public class Summary {
         this.id = id;
     }
 
-    public double getTotalSalesIncome() {
+    public BigDecimal getTotalSalesIncome() {
         return totalSalesIncome;
     }
 
-    public void setTotalSalesIncome(double totalSalesIncome) {
+    public void setTotalSalesIncome(BigDecimal totalSalesIncome) {
         this.totalSalesIncome = totalSalesIncome;
     }
 
-    public double getTotalPurchaseInvestment() {
+    public BigDecimal getTotalPurchaseInvestment() {
         return totalPurchaseInvestment;
     }
 
-    public void setTotalPurchaseInvestment(double totalPurchaseInvestment) {
+    public void setTotalPurchaseInvestment(BigDecimal totalPurchaseInvestment) {
         this.totalPurchaseInvestment = totalPurchaseInvestment;
     }
 
