@@ -1,4 +1,4 @@
-package com.eucaliptus.springboot_app_products.config;
+package com.eucaliptus.springboot_app_notifications.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

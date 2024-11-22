@@ -1,6 +1,7 @@
 package com.eucaliptus.springboot_app_products.service;
 
 import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
+import com.eucaliptus.springboot_app_products.dto.NotificationDTO;
 import com.eucaliptus.springboot_app_products.mappers.StockMapper;
 import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.model.Stock;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +21,9 @@ public class StockService {
     private StockRepository stockRepository;
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public List<Stock> getStocksAvailable(){
         return stockRepository.findLatestStockByProduct();
@@ -46,11 +51,17 @@ public class StockService {
                     existStock.get().getQuantityAvailable() + batch.getQuantityPurchased();
             stock.setQuantityAvailable(quantity);
             saveStock(stock);
+
+            NotificationDTO notification = new NotificationDTO();
+            notification.setIdNotification("unique-id-" + System.currentTimeMillis()); // Genera un ID único
+            notification.setMessage("El stock se actualizó correctamente para el producto " + batch.getIdProduct());
+            notification.setNotificationDate(new Date());
+            notification.setIdStock(Math.toIntExact(stock.getIdStock()));
+            notification.setIdProduct(Integer.valueOf(stock.getProduct().getIdProduct()));
+
+            // Llamada al microservicio de notificaciones
+            notificationService.sendNotification(notification);
         }
         return true;
     }
-
-
-
-
 }

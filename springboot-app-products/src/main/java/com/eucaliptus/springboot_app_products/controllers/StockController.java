@@ -4,6 +4,7 @@ import com.eucaliptus.springboot_app_products.dto.*;
 import com.eucaliptus.springboot_app_products.mappers.StockMapper;
 import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.service.BatchService;
+import com.eucaliptus.springboot_app_products.service.NotificationService;
 import com.eucaliptus.springboot_app_products.service.SaleService;
 import com.eucaliptus.springboot_app_products.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +28,9 @@ public class StockController {
     private BatchService batchService;
     @Autowired
     private SaleService saleService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -92,5 +97,25 @@ public class StockController {
         }
     }
 
+    @PostMapping("/sendStockNotification")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> sendStockNotification(@RequestBody Stock stock) {
+        try {
+            // Generar la notificación
+            NotificationDTO notification = new NotificationDTO();
+            notification.setIdNotification("unique-id-" + System.currentTimeMillis()); // Genera un ID único
+            notification.setMessage("Stock actualizado para el producto " + stock.getProduct().getIdProduct());
+            notification.setNotificationDate(new Date());
+            notification.setIdStock(Math.toIntExact(stock.getIdStock()));
+            notification.setIdProduct(Integer.valueOf(stock.getProduct().getIdProduct()));
+
+            // Llamada al microservicio de notificaciones
+            notificationService.sendNotification(notification);
+            return new ResponseEntity<>(new Message("Notificación enviada con éxito"), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Error al enviar la notificación"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
