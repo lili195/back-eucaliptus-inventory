@@ -18,8 +18,4 @@ public class JacksonConfig {
         return objectMapper;
     }
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 }
