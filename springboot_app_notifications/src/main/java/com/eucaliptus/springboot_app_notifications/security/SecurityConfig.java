@@ -4,7 +4,6 @@ import com.eucaliptus.springboot_app_notifications.utlities.ServicesUri;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,19 +26,6 @@ public class SecurityConfig {
     @Bean
     public JwtRequestFilter jwtRequestFilter() {
         return new JwtRequestFilter();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF si no es necesario
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/notifications/add").authenticated() // Requiere autenticación
-                        .anyRequest().permitAll() // Permitir todas las demás solicitudes (ajusta según sea necesario)
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless para JWT
-                .cors(Customizer.withDefaults()); // Configuración CORS
-        return http.build();
     }
 
     @Bean

@@ -33,8 +33,8 @@ public class NotificationController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> createNotification(@RequestBody NotificationDTO notificationDTO) {
         try {
-        notificationService.saveNotification(notificationDTO);
-        return ResponseEntity.ok("Notification received");
+            notificationService.saveNotification(notificationDTO);
+            return ResponseEntity.ok(new Message("Notification received"));
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Error al guardar las notificaciones. Intente más tarde."), HttpStatus.INTERNAL_SERVER_ERROR);
