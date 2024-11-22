@@ -97,25 +97,6 @@ public class StockController {
         }
     }
 
-    @PostMapping("/sendStockNotification")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<Object> sendStockNotification(@RequestBody Stock stock) {
-        try {
-            // Generar la notificación
-            NotificationDTO notification = new NotificationDTO();
-            notification.setIdNotification("unique-id-" + System.currentTimeMillis()); // Genera un ID único
-            notification.setMessage("Stock actualizado para el producto " + stock.getProduct().getIdProduct());
-            notification.setNotificationDate(new Date());
-            notification.setIdStock(Math.toIntExact(stock.getIdStock()));
-            notification.setIdProduct(Integer.valueOf(stock.getProduct().getIdProduct()));
 
-            // Llamada al microservicio de notificaciones
-            notificationService.sendNotification(notification);
-            return new ResponseEntity<>(new Message("Notificación enviada con éxito"), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(new Message("Error al enviar la notificación"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 }
