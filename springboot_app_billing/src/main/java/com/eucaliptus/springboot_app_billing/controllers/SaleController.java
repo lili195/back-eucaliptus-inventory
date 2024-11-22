@@ -6,9 +6,11 @@ import com.eucaliptus.springboot_app_billing.dto.SaleDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.SaleDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.SaleMapper;
 import com.eucaliptus.springboot_app_billing.model.Sale;
+import com.eucaliptus.springboot_app_billing.model.Summary;
 import com.eucaliptus.springboot_app_billing.service.ProductService;
 import com.eucaliptus.springboot_app_billing.service.SaleDetailService;
 import com.eucaliptus.springboot_app_billing.service.SaleService;
+import com.eucaliptus.springboot_app_billing.service.SummaryService;
 import com.eucaliptus.springboot_app_products.dto.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ public class SaleController {
     private SaleDetailService saleDetailService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SummaryService summaryService;
 
     @PostMapping("/addSale")
     public ResponseEntity<Object> addSale(@RequestBody SaleDTO saleDTO, HttpServletRequest request) {
@@ -83,6 +87,20 @@ public class SaleController {
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<Object> getGlobalSummary() {
+        try {
+            Optional<Summary> summary = summaryService.getGlobalSummary();
+            if (summary.isEmpty()) {
+                return new ResponseEntity<>(new Message("Resumen no disponible"), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(summary.get(), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Error al obtener el resumen global"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
