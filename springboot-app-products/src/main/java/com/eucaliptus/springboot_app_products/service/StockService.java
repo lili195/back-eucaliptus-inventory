@@ -51,16 +51,6 @@ public class StockService {
                     existStock.get().getQuantityAvailable() + batch.getQuantityPurchased();
             stock.setQuantityAvailable(quantity);
             saveStock(stock);
-
-//            NotificationDTO notification = new NotificationDTO();
-//            notification.setIdNotification("unique-id-" + System.currentTimeMillis()); // Genera un ID único
-//            notification.setMessage("El stock se actualizó correctamente para el producto " + batch.getIdProduct());
-//            notification.setNotificationDate(new Date());
-//            notification.setIdStock(Math.toIntExact(stock.getIdStock()));
-//            notification.setIdProduct(Integer.valueOf(stock.getProduct().getIdProduct()));
-//
-//            // Llamada al microservicio de notificaciones
-//            notificationService.sendNotification(notification);
         }
         return true;
     }

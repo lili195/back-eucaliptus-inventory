@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public class ProductService {
     private RestTemplate restTemplate;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private APIService apiService;
 
     public List<Product> getAllActiveProducts() {
         return productRepository.findByActiveTrue();
@@ -48,7 +51,7 @@ public class ProductService {
 
     public boolean existsProviderId(String  providerId, String token) {
         try{
-            HttpEntity<String> entity = new HttpEntity<>(getHeader(token));
+            HttpEntity<String> entity = new HttpEntity<>(apiService.getHeader(token));
             ResponseEntity<ProviderDTO> response = restTemplate.exchange(
                 ServicesUri.PERSON_SERVICE + "/person/providers/getProviderById/" + providerId,
                     HttpMethod.GET,
@@ -88,18 +91,13 @@ public class ProductService {
         }).orElse(false);
     }
 
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
-
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
+    @Transactional
+    public boolean deleteProductsByIdProvider(String idProvider) {
+        List<Product> products = getProductsByIdProvider(idProvider);
+        for (Product product : products)
+            if (!deleteProduct(product.getIdProduct()))
+                throw new IllegalArgumentException("Producto no encontrado");
+        return true;
     }
 
     public List<ProductExpiringSoonDTO> getProductsExpiringSoon() {

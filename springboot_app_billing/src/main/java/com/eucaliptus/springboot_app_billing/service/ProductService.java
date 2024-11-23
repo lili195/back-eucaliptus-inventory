@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     @Autowired
+    private APIService apiService;
+    @Autowired
     private RestTemplate restTemplate;
 
     public List<SaleDetailDTO> getSaleDetails(List<SaleDetailDTO> sales, String token){
@@ -88,7 +90,7 @@ public class ProductService {
     }
 
     private List<ProductDTO> getProducts(List<String> ids, String token){
-        HttpEntity<List<String>> entity = new HttpEntity<>(ids, getHeader(token));
+        HttpEntity<List<String>> entity = new HttpEntity<>(ids, apiService.getHeader(token));
         ResponseEntity<List<ProductDTO>> response = restTemplate.exchange(
                 ServicesUri.PRODUCT_SERVICE + "/products/getProductsById",
                 HttpMethod.POST,
@@ -100,17 +102,4 @@ public class ProductService {
         return response.getBody();
     }
 
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
-
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
-    }
 }

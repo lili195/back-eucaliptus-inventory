@@ -9,6 +9,7 @@ import com.eucaliptus.springboot_app_products.mappers.UnitMapper;
 import com.eucaliptus.springboot_app_products.model.Product;
 import com.eucaliptus.springboot_app_products.model.Stock;
 import com.eucaliptus.springboot_app_products.model.Unit;
+import com.eucaliptus.springboot_app_products.service.APIService;
 import com.eucaliptus.springboot_app_products.service.ProductService;
 import com.eucaliptus.springboot_app_products.service.StockService;
 import com.eucaliptus.springboot_app_products.service.UnitService;
@@ -35,7 +36,7 @@ public class ProductController {
     @Autowired
     private UnitService unitService;
     @Autowired
-    private StockService stockService;
+    private APIService apiService;
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -104,7 +105,7 @@ public class ProductController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> createProduct(@RequestBody ProductDTO productDTO, HttpServletRequest request) {
         try {
-            if (!productService.existsProviderId(productDTO.getIdProvider(), productService.getTokenByRequest(request)))
+            if (!productService.existsProviderId(productDTO.getIdProvider(), apiService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Proveedor no existente"), HttpStatus.BAD_REQUEST);
             if (productService.existsByIdProduct(productDTO.getIdProduct()))
                 return new ResponseEntity<>(new Message("Id de producto ya existente"), HttpStatus.BAD_REQUEST);
@@ -156,6 +157,21 @@ public class ProductController {
             if (productService.deleteProduct(idProduct))
                 return new ResponseEntity<>(new Message("Producto eliminado exitosamente"), HttpStatus.OK);
             return new ResponseEntity<>(new Message("Error con la base de datos"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo más tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/deleteProductsByProvider/{idProvider}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<Object> deleteProductsByProvider(@PathVariable("idProvider") String idProvider) {
+        try {
+            productService.deleteProductsByIdProvider(idProvider);
+            return new ResponseEntity<>(new Message("Producto eliminado exitosamente"), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo más tarde"), HttpStatus.INTERNAL_SERVER_ERROR);

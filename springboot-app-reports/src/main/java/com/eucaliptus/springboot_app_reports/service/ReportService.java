@@ -25,12 +25,14 @@ import java.util.stream.Collectors;
 public class ReportService {
 
     @Autowired
+    private APIService apiService;
+    @Autowired
     public RestTemplate restTemplate;
 
     public List<ReportDTO> getReports(Date startDate, Date endDate, String token){
         List<ProductsSaleDTO> sales = this.getProductsSale(startDate, endDate, token);
         List<String> ids = sales.stream().map(ProductsSaleDTO::getProductId).toList();
-        HttpEntity<List<String>> entity = new HttpEntity<>(ids, getHeader(token));
+        HttpEntity<List<String>> entity = new HttpEntity<>(ids, apiService.getHeader(token));
         ResponseEntity<List<ProductDTO>> response = restTemplate.exchange(
                 ServicesUri.PRODUCT_SERVICE + "/products/getProductsById",
                 HttpMethod.POST,
@@ -44,7 +46,7 @@ public class ReportService {
     }
 
     private List<ProductsSaleDTO> getProductsSale(Date startDate, Date endDate, String token) {
-        HttpEntity<DatesDTO> entity = new HttpEntity<>(new DatesDTO(startDate, endDate), getHeader(token));
+        HttpEntity<DatesDTO> entity = new HttpEntity<>(new DatesDTO(startDate, endDate), apiService.getHeader(token));
         ResponseEntity<List<ProductsSaleDTO>> response = restTemplate.exchange(
                 ServicesUri.BILLING_SERVICE + "/billing/sale/getProductsSale",
                 HttpMethod.POST,
@@ -71,19 +73,5 @@ public class ReportService {
             }
         }
         return reports;
-    }
-
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
-
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
     }
 }

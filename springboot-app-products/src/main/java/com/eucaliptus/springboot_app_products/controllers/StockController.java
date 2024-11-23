@@ -29,9 +29,6 @@ public class StockController {
     @Autowired
     private SaleService saleService;
 
-    @Autowired
-    private NotificationService notificationService;
-
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> findAll() {

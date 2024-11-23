@@ -18,6 +18,8 @@ public class UserService {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private APIService apiService;
 
     public boolean createUser(SellerDTO seller, String token) {
         try{
@@ -26,7 +28,7 @@ public class UserService {
                     seller.getPersonDTO().getEmail(),
                     seller.getPassword(),
                     EnumRole.ROLE_SELLER.name());
-            HttpEntity<UserDTO> entity = new HttpEntity<>(userDTO, getHeader(token));
+            HttpEntity<UserDTO> entity = new HttpEntity<>(userDTO, apiService.getHeader(token));
             ResponseEntity<UserDTO> response = restTemplate.exchange(
                     ServicesUri.AUTH_SERVICE + "/auth/addSeller",
                     HttpMethod.POST,
@@ -44,7 +46,7 @@ public class UserService {
 
     public boolean updateUserInfo(UpdateUserDTO userDetails, String token) {
         try{
-            HttpEntity<UpdateUserDTO> entity = new HttpEntity<>(userDetails, getHeader(token));
+            HttpEntity<UpdateUserDTO> entity = new HttpEntity<>(userDetails, apiService.getHeader(token));
             ResponseEntity<String> response = restTemplate.exchange(
                     ServicesUri.AUTH_SERVICE + "/auth/updateUserInfo",
                     HttpMethod.PUT,
@@ -64,7 +66,7 @@ public class UserService {
                     .fromHttpUrl(ServicesUri.AUTH_SERVICE + "/auth/deleteSeller")
                     .queryParam("username", username)
                     .toUriString();
-            HttpEntity<Message> entity = new HttpEntity<>(getHeader(token));
+            HttpEntity<Message> entity = new HttpEntity<>(apiService.getHeader(token));
             ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.DELETE,
@@ -78,17 +80,4 @@ public class UserService {
         }
     }
 
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
-
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
-    }
 }

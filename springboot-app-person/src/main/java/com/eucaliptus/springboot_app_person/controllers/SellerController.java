@@ -30,6 +30,8 @@ public class SellerController {
     @Autowired
     private DocumentTypeService documentTypeService;
     @Autowired
+    private APIService apiService;
+    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/all")
@@ -71,7 +73,7 @@ public class SellerController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getSellerInfoByToken(HttpServletRequest request) {
         try{
-            String token = userService.getTokenByRequest(request);
+            String token = apiService.getTokenByRequest(request);
             String username = jwtTokenUtil.extractUsername(token);
             if(!sellerService.existsByUsername(username))
                 return new ResponseEntity<>(new Message("Vendedor no encontrado"), HttpStatus.BAD_REQUEST);
@@ -94,7 +96,7 @@ public class SellerController {
                     documentTypeService.saveDocumentType(documentType) :
                     documentTypeService.findByNameType(documentType.getNameType()).get();
             Seller seller = SellerMapper.sellerDTOToSeller(sellerDTO, documentType);
-            if (!userService.createUser(sellerDTO, userService.getTokenByRequest(request)))
+            if (!userService.createUser(sellerDTO, apiService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
             return new ResponseEntity<>(SellerMapper.sellerToSellerDTO(sellerService.saveSeller(seller)), HttpStatus.OK);
         } catch (Exception e){
@@ -122,27 +124,18 @@ public class SellerController {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO, HttpServletRequest request) {
         try{
-            String role = jwtTokenUtil.extractAllClaims(userService.getTokenByRequest(request)).get("role", String.class);
+            String role = jwtTokenUtil.extractAllClaims(apiService.getTokenByRequest(request)).get("role", String.class);
             if (!sellerService.existsByUsername(updateUserDTO.getOldUsername()) && !role.equals(EnumRole.ROLE_ADMIN.name()))
                 return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
             if (sellerService.existsByUsername(updateUserDTO.getNewUsername()) && !updateUserDTO.getNewUsername().equals(updateUserDTO.getOldUsername()))
                 return new ResponseEntity<>(new Message("El username ya existe"), HttpStatus.CONFLICT);
-            if (userService.updateUserInfo(updateUserDTO, userService.getTokenByRequest(request))) {
-                if (role.equals(EnumRole.ROLE_ADMIN.name())) {
-                    Person person = personService.getAdmin().get();
-                    person.setEmail(updateUserDTO.getEmail());
-                    person.setFirstName(updateUserDTO.getFirstName());
-                    person.setLastName(updateUserDTO.getLastName());
-                    personService.updatePerson(person.getIdNumber(), person);
-                } else {
-                    Seller seller = sellerService.getSellerByUsername(updateUserDTO.getOldUsername()).get();
-                    seller.setUsername(updateUserDTO.getNewUsername());
-                    seller.setEmail(updateUserDTO.getEmail());
-                    seller.setFirstName(updateUserDTO.getFirstName());
-                    seller.setLastName(updateUserDTO.getLastName());
-
-                    sellerService.updateSeller(seller.getIdNumber(), seller).get();
-                }
+            if (userService.updateUserInfo(updateUserDTO, apiService.getTokenByRequest(request))) {
+                Seller seller = sellerService.getSellerByUsername(updateUserDTO.getOldUsername()).get();
+                seller.setUsername(updateUserDTO.getNewUsername());
+                seller.setEmail(updateUserDTO.getEmail());
+                seller.setFirstName(updateUserDTO.getFirstName());
+                seller.setLastName(updateUserDTO.getLastName());
+                sellerService.updateSeller(seller.getIdNumber(), seller).get();
                 return new ResponseEntity<>(new Message("Cuenta actualizada"), HttpStatus.OK);
             }
             return new ResponseEntity<>(new Message("Error al modificar la cuenta"), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -158,8 +151,8 @@ public class SellerController {
         try{
             if(!sellerService.existsById(idSeller))
                 return new ResponseEntity<>(new Message("Este vendedor no existe"), HttpStatus.BAD_REQUEST);
-            if(sellerService.deleteSeller(idSeller, userService.getTokenByRequest(request))
-            && userService.deleteUserAccount(sellerService.getSellerById(idSeller).get().getUsername(), userService.getTokenByRequest(request)))
+            if(sellerService.deleteSeller(idSeller, apiService.getTokenByRequest(request))
+            && userService.deleteUserAccount(sellerService.getSellerById(idSeller).get().getUsername(), apiService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Vendedor eliminado"), HttpStatus.OK);
             return new ResponseEntity<>(new Message("Error con la bd"), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {

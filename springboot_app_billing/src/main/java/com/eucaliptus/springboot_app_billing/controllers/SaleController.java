@@ -7,10 +7,7 @@ import com.eucaliptus.springboot_app_billing.mappers.SaleDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.SaleMapper;
 import com.eucaliptus.springboot_app_billing.model.Sale;
 import com.eucaliptus.springboot_app_billing.model.Summary;
-import com.eucaliptus.springboot_app_billing.service.ProductService;
-import com.eucaliptus.springboot_app_billing.service.SaleDetailService;
-import com.eucaliptus.springboot_app_billing.service.SaleService;
-import com.eucaliptus.springboot_app_billing.service.SummaryService;
+import com.eucaliptus.springboot_app_billing.service.*;
 import com.eucaliptus.springboot_app_products.dto.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +29,8 @@ public class SaleController {
     private ProductService productService;
     @Autowired
     private SummaryService summaryService;
+    @Autowired
+    private APIService apiService;
 
     @PostMapping("/addSale")
     public ResponseEntity<Object> addSale(@RequestBody SaleDTO saleDTO, HttpServletRequest request) {
@@ -39,7 +38,7 @@ public class SaleController {
             SaleDTO sale = SaleMapper.saleToSaleDTO(saleService.addSale(saleDTO, request));
             List<SaleDetailDTO> saleDetailDTOS = saleDetailService.getSalesBySale(sale.getIdSale()).stream().
                     map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList();
-            saleDetailDTOS = productService.getSaleDetails(saleDetailDTOS, productService.getTokenByRequest(request));
+            saleDetailDTOS = productService.getSaleDetails(saleDetailDTOS, apiService.getTokenByRequest(request));
             sale.setSaleDetails(saleDetailDTOS);
             return new ResponseEntity<>(sale, HttpStatus.OK);
         } catch (IllegalArgumentException e){
@@ -71,7 +70,7 @@ public class SaleController {
             SaleDTO saleDTO = SaleMapper.saleToSaleDTO(opSale.get());
             List<SaleDetailDTO> saleDetailDTOS = saleDetailService.getSalesBySale(saleDTO.getIdSale()).stream().
                     map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList();
-            saleDetailDTOS = productService.getSaleDetails(saleDetailDTOS, productService.getTokenByRequest(request));
+            saleDetailDTOS = productService.getSaleDetails(saleDetailDTOS, apiService.getTokenByRequest(request));
             saleDTO.setSaleDetails(saleDetailDTOS);
             return new ResponseEntity<>(saleDTO, HttpStatus.OK);
         } catch (Exception e){

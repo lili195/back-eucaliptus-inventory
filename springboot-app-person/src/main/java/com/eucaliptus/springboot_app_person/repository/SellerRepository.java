@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_person.repository;
 
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.model.Seller;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ public interface SellerRepository extends JpaRepository<Seller, String> {
 
     boolean existsByUsername(String Username);
 
-    List<Seller> findByActiveTrue();
+    List<Seller> findByActiveTrueAndRole(EnumRole role);
 
     Optional<Seller> findByIdNumber(String personId);
 

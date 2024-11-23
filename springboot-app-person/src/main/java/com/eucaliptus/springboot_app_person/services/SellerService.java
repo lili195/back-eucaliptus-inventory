@@ -1,5 +1,6 @@
 package com.eucaliptus.springboot_app_person.services;
 
+import com.eucaliptus.springboot_app_person.enums.EnumRole;
 import com.eucaliptus.springboot_app_person.model.Seller;
 import com.eucaliptus.springboot_app_person.repository.SellerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class SellerService {
     }
 
     public List<Seller> getAllActiveSellers() {
-        return sellerRepository.findByActiveTrue();
+        return sellerRepository.findByActiveTrueAndRole(EnumRole.ROLE_SELLER);
     }
 
     public Optional<Seller> getSellerById(String id) {

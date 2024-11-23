@@ -10,6 +10,7 @@ import com.eucaliptus.springboot_app_person.mappers.CompanyMapper;
 import com.eucaliptus.springboot_app_person.mappers.ProviderMapper;
 import com.eucaliptus.springboot_app_person.model.*;
 import com.eucaliptus.springboot_app_person.services.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,8 @@ public class ProviderController {
     @Autowired
     private CompanyService companyService;
     @Autowired
+    private APIService apiService;
+    @Autowired
     private DocumentTypeService documentTypeService;
 
     @GetMapping("/all")
@@ -47,6 +50,23 @@ public class ProviderController {
     public ResponseEntity<Object> getProviderById(@PathVariable String id) {
         try{
             Optional<Person> opPerson = personService.getActivePersonById(id);
+            if (opPerson.isPresent()) {
+                if (opPerson.get().getRole().equals(EnumRole.ROLE_PROVIDER))
+                    return new ResponseEntity<>(ProviderMapper.providerToProviderDTO(providerService.getProviderById(id).get()), HttpStatus.OK);
+                if (opPerson.get().getRole().equals(EnumRole.ROLE_COMPANY))
+                    return new ResponseEntity<>(ProviderMapper.providerToProviderDTO(providerService.getProviderByCompanyId(id).get()), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(new Message("Proveedor no encontrado"), HttpStatus.BAD_REQUEST);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getProvider/{id}")
+    public ResponseEntity<Object> getProvider(@PathVariable String id) {
+        try{
+            Optional<Person> opPerson = personService.getPersonById(id);
             if (opPerson.isPresent()) {
                 if (opPerson.get().getRole().equals(EnumRole.ROLE_PROVIDER))
                     return new ResponseEntity<>(ProviderMapper.providerToProviderDTO(providerService.getProviderById(id).get()), HttpStatus.OK);
@@ -140,14 +160,18 @@ public class ProviderController {
     }
 
     @DeleteMapping("/deleteProvider/{idProvider}")
-    public ResponseEntity<Object> deleteProvider(@PathVariable String idProvider) {
+    public ResponseEntity<Object> deleteProvider(@PathVariable String idProvider, HttpServletRequest request) {
         try {
-            if(!providerService.existsById(idProvider))
+            if (!providerService.existsById(idProvider))
                 return new ResponseEntity<>(new Message("Este proveedor no existe"), HttpStatus.BAD_REQUEST);
-            if(providerService.deleteProvider(idProvider))
+            if (providerService.deleteProviderAndProducts(idProvider, apiService.getTokenByRequest(request)))
                 return new ResponseEntity<>(new Message("Proveedor eliminado"), HttpStatus.OK);
             return new ResponseEntity<>(new Message("Error con la bd"), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IllegalArgumentException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

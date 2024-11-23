@@ -40,6 +40,8 @@ public class SaleService {
     private ClientService clientService;
     @Autowired
     private SaleDetailService saleDetailService;
+    @Autowired
+    private APIService apiService;
 
     public List<Sale> getSalesByDate(Date date) {
         return saleRepository.findBySaleDate(date);
@@ -55,11 +57,11 @@ public class SaleService {
 
     @Transactional
     public Sale addSale(SaleDTO saleDTO, HttpServletRequest request){
-        String sellerId = getIdSeller(getTokenByRequest(request));
+        String sellerId = getIdSeller(apiService.getTokenByRequest(request));
         if (sellerId.isEmpty())
             throw new IllegalArgumentException("Vendedor no encontrado");
         saleDTO.setIdSeller(sellerId);
-        List<SaleDetailDTO> saleDetailDTOS = getSaleDetails(saleDTO, getTokenByRequest(request));
+        List<SaleDetailDTO> saleDetailDTOS = getSaleDetails(saleDTO, apiService.getTokenByRequest(request));
         saleDTO.setTotal(this.calculateTotal(saleDetailDTOS));
         Client clientSaved = clientService.saveClient(ClientMapper.clientDTOToClient(saleDTO.getClientDTO()));
         Sale sale = SaleMapper.saleDTOToSale(saleDTO);
@@ -72,14 +74,14 @@ public class SaleService {
             saleDetail.setSale(sale);
             saleDetailSaved.add(saleDetailService.saveSaleDetail(saleDetail));
         }
-        if (!updateStock(saleDetailSaved, getTokenByRequest(request)))
+        if (!updateStock(saleDetailSaved, apiService.getTokenByRequest(request)))
             throw new IllegalArgumentException("Error actualizando lotes");
         return sale;
     }
 
     private String getIdSeller(String token){
         try{
-            HttpEntity<String> entity = new HttpEntity<>(getHeader(token));
+            HttpEntity<String> entity = new HttpEntity<>(apiService.getHeader(token));
             ResponseEntity<SellerDTO> response = restTemplate.exchange(
                     ServicesUri.PERSON_SERVICE + "/person/sellers/getSellerInfoByToken",
                     HttpMethod.GET,
@@ -96,7 +98,7 @@ public class SaleService {
     private List<SaleDetailDTO> getSaleDetails(SaleDTO saleDTO, String token){
         try {
             List<RequestBatchDTO> requestBatch = saleDTO.getSaleDetails().stream().map(SaleDetailMapper::saleDetailDTOToRequestBatchDTO).toList();
-            HttpEntity<List<RequestBatchDTO>> entity = new HttpEntity<>(requestBatch, getHeader(token));
+            HttpEntity<List<RequestBatchDTO>> entity = new HttpEntity<>(requestBatch, apiService.getHeader(token));
             ResponseEntity<List<SaleDetailDTO>> response = restTemplate.exchange(
                     ServicesUri.PRODUCT_SERVICE + "/products/stock/requestBatches",
                     HttpMethod.POST,
@@ -113,7 +115,7 @@ public class SaleService {
     private boolean updateStock(List<SaleDetail> saleDetails, String token){
         try{
             List<SaleDetailDTO> saleDetailDTOS = saleDetails.stream().map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList();
-            HttpEntity<List<SaleDetailDTO>> entity = new HttpEntity<>(saleDetailDTOS, getHeader(token));
+            HttpEntity<List<SaleDetailDTO>> entity = new HttpEntity<>(saleDetailDTOS, apiService.getHeader(token));
             ResponseEntity<String> response = restTemplate.exchange(
                     ServicesUri.PRODUCT_SERVICE + "/products/stock/reduceStock",
                     HttpMethod.POST,
@@ -134,17 +136,4 @@ public class SaleService {
         return total;
     }
 
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
-
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
-    }
 }

@@ -6,6 +6,7 @@ import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseMapper;
 import com.eucaliptus.springboot_app_billing.model.Purchase;
+import com.eucaliptus.springboot_app_billing.service.APIService;
 import com.eucaliptus.springboot_app_billing.service.ProductService;
 import com.eucaliptus.springboot_app_billing.service.PurchaseDetailService;
 import com.eucaliptus.springboot_app_billing.service.PurchaseService;
@@ -29,6 +30,8 @@ public class PurchaseController {
     PurchaseDetailService purchaseDetailService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private APIService apiService;
 
     @PostMapping("/add")
     public ResponseEntity<Object> addPurchase(@RequestBody PurchaseDTO purchaseDTO, HttpServletRequest request) {
@@ -36,7 +39,7 @@ public class PurchaseController {
             PurchaseDTO purchase = PurchaseMapper.purchaseToPurchaseDTO(purchaseService.saveNewPurchase(purchaseDTO, request));
             List<PurchaseDetailDTO> purchaseDetailDTOS = purchaseDetailService.findByPurchaseId(purchase.getPurchaseId()).stream().
                     map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList();
-            purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, productService.getTokenByRequest(request));
+            purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, apiService.getTokenByRequest(request));
             purchase.setPurchaseDetails(purchaseDetailDTOS);
             return new ResponseEntity<>(purchase, HttpStatus.OK);
         } catch (IllegalArgumentException e){
@@ -68,7 +71,8 @@ public class PurchaseController {
             PurchaseDTO purchaseDTO = PurchaseMapper.purchaseToPurchaseDTO(opPurchase.get());
             List<PurchaseDetailDTO> purchaseDetailDTOS = purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
                     map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList();
-            purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, productService.getTokenByRequest(request));
+            purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, apiService.getTokenByRequest(request));
+            purchaseDTO.setProviderDTO(purchaseService.getProvider(purchaseDTO.getProviderId(), apiService.getTokenByRequest(request)));
             purchaseDTO.setPurchaseDetails(purchaseDetailDTOS);
             return new ResponseEntity<>(purchaseDTO, HttpStatus.OK);
         } catch (Exception e){

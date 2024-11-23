@@ -1,10 +1,18 @@
 package com.eucaliptus.springboot_app_person.services;
 
 
+import com.eucaliptus.springboot_app_person.dtos.Message;
 import com.eucaliptus.springboot_app_person.model.Provider;
 import com.eucaliptus.springboot_app_person.repository.ProviderRepository;
+import com.eucaliptus.springboot_app_person.utlities.ServicesUri;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +22,10 @@ public class ProviderService {
 
     @Autowired
     private ProviderRepository providerRepository;
+    @Autowired
+    private APIService apiService;
+    @Autowired
+    private RestTemplate restTemplate;
 
     public List<Provider> getAllProviders() {
         return providerRepository.findAll();
@@ -60,6 +72,26 @@ public class ProviderService {
             providerRepository.save(provider);
             return true;
         }).orElse(false);
+    }
+
+    @Transactional
+    public boolean deleteProviderAndProducts(String idProvider, String token) {
+        if (!deleteProvider(idProvider))
+            throw new IllegalArgumentException("Error eliminando proveedor");
+        if (!deleteProductsFromProvider(idProvider, token))
+            throw new IllegalArgumentException("Error eliminando productos");
+        return true;
+    }
+
+    private boolean deleteProductsFromProvider(String idProvider, String token){
+        HttpEntity<Void> entity = new HttpEntity<>(apiService.getHeader(token));
+        ResponseEntity<String> response = restTemplate.exchange(
+        ServicesUri.PRODUCT_SERVICE + "/products/deleteProductsByProvider/" + idProvider,
+                HttpMethod.DELETE,
+                entity,
+                String.class
+        );
+        return response.getStatusCode().is2xxSuccessful();
     }
 
 

@@ -10,6 +10,7 @@ import com.eucaliptus.springboot_app_billing.repository.PurchaseRepository;
 import com.eucaliptus.springboot_app_billing.utlities.ServicesUri;
 import com.eucaliptus.springboot_app_person.dtos.ProviderDTO;
 import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
+import com.eucaliptus.springboot_app_products.dto.ProductDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -34,6 +35,8 @@ public class PurchaseService {
     private PurchaseRepository purchaseRepository;
     @Autowired
     private PurchaseDetailService purchaseDetailService;
+    @Autowired
+    private APIService apiService;
 
     public Optional<Purchase> getById(int id) {
         return purchaseRepository.findById(id);
@@ -53,7 +56,7 @@ public class PurchaseService {
 
     @Transactional
     public Purchase saveNewPurchase(PurchaseDTO purchaseDTO, HttpServletRequest request) {
-        if (!existsProviderId(purchaseDTO.getProviderId(), getTokenByRequest(request)))
+        if (!existsProviderId(purchaseDTO.getProviderId(), apiService.getTokenByRequest(request)))
             throw new IllegalArgumentException("Este proveedor no existe");
         purchaseDTO.setTotalPurchase(calculateTotal(purchaseDTO.getPurchaseDetails()));
         Purchase purchaseSaved = savePurchase(PurchaseMapper.purchaseDTOToPurchase(purchaseDTO));
@@ -63,14 +66,14 @@ public class PurchaseService {
             purchaseDetail.setPurchase(purchaseSaved);
             purchases.add(purchaseDetailService.savePurchaseDetail(purchaseDetail));
         }
-        if (!createBatches(purchases, getTokenByRequest(request)))
+        if (!createBatches(purchases, apiService.getTokenByRequest(request)))
             throw new IllegalArgumentException("Error al crear los lotes");
         return purchaseSaved;
     }
 
     public boolean existsProviderId(String  providerId, String token) {
         try{
-            HttpEntity<String> entity = new HttpEntity<>(getHeader(token));
+            HttpEntity<String> entity = new HttpEntity<>(apiService.getHeader(token));
             ResponseEntity<ProviderDTO> response = restTemplate.exchange(
                     ServicesUri.PERSON_SERVICE + "/person/providers/getProviderById/" + providerId,
                     HttpMethod.GET,
@@ -87,7 +90,7 @@ public class PurchaseService {
     public boolean createBatches(List<PurchaseDetail> purchases, String token) {
         List<NewBatchDTO> batches = purchases.stream().map(PurchaseDetailMapper::purchaseDetailToNewBatchDTO).toList();
         try{
-            HttpEntity<List<NewBatchDTO>> entity = new HttpEntity<>(batches, getHeader(token));
+            HttpEntity<List<NewBatchDTO>> entity = new HttpEntity<>(batches, apiService.getHeader(token));
             ResponseEntity<Object> response = restTemplate.exchange(
                     ServicesUri.PRODUCT_SERVICE + "/products/stock/addBatches",
                     HttpMethod.POST,
@@ -101,6 +104,24 @@ public class PurchaseService {
         }
     }
 
+    public ProviderDTO getProvider(String  providerId, String token) {
+        try{
+            HttpEntity<String> entity = new HttpEntity<>(apiService.getHeader(token));
+            ResponseEntity<ProviderDTO> response = restTemplate.exchange(
+                    ServicesUri.PERSON_SERVICE + "/person/providers/getProvider/" + providerId,
+                    HttpMethod.GET,
+                    entity,
+                    ProviderDTO.class
+            );
+            if (response.getStatusCode().is2xxSuccessful())
+                return response.getBody();
+            return new ProviderDTO();
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ProviderDTO();
+        }
+    }
+
     private Double calculateTotal(List<PurchaseDetailDTO> purchases) {
         double total = 0;
         for (PurchaseDetailDTO purchaseDetail: purchases)
@@ -108,18 +129,4 @@ public class PurchaseService {
         return total;
     }
 
-
-    public String getTokenByRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer "))
-            token = authHeader.substring(7);
-        return token;
-    }
-
-    private HttpHeaders getHeader(String token){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        return headers;
-    }
 }
