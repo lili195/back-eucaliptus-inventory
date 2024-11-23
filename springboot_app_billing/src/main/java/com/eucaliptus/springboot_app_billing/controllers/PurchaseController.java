@@ -40,6 +40,7 @@ public class PurchaseController {
             List<PurchaseDetailDTO> purchaseDetailDTOS = purchaseDetailService.findByPurchaseId(purchase.getPurchaseId()).stream().
                     map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList();
             purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, apiService.getTokenByRequest(request));
+            purchase.setProviderDTO(purchaseService.getProvider(purchase.getProviderId(), apiService.getTokenByRequest(request)));
             purchase.setPurchaseDetails(purchaseDetailDTOS);
             return new ResponseEntity<>(purchase, HttpStatus.OK);
         } catch (IllegalArgumentException e){
