@@ -11,26 +11,52 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import java.util.Properties;
 
+/**
+ * Clase de configuración para el servicio de correo electrónico.
+ * <p>
+ * Carga las propiedades del archivo `email.properties` para configurar
+ * el envío de correos electrónicos mediante JavaMailSender.
+ */
+
 @Configuration
 @PropertySource("classpath:email.properties")
 public class EmailConfig {
+
+    /** Nombre de usuario para el servidor de correo electrónico. */
+
     @Value("${email.username}")
     private String username;
+
+    /** Contraseña para autenticación del correo electrónico. */
 
     @Value("${email.password}")
     private String password;
 
+    /** Indicador de autenticación SMTP. */
+
     @Value("${email.auth}")
     private String auth;
+
+    /** Dirección del servidor SMTP. */
 
     @Value("${email.host}")
     private String host;
 
+    /** Puerto del servidor SMTP. */
+
     @Value("${email.port}")
     private String port;
 
+    /** Indicador de habilitación de STARTTLS. */
+
     @Value("${email.starttls.enable}")
     private String tlsenable;
+
+    /**
+     * Configura las propiedades necesarias para el envío de correos electrónicos.
+     *
+     * @return un objeto {@link Properties} con las configuraciones de correo.
+     */
 
     private Properties getMailProperties() {
         Properties properties = new Properties();
@@ -41,6 +67,12 @@ public class EmailConfig {
         return properties;
     }
 
+    /**
+     * Define un bean de tipo {@link JavaMailSender} para manejar el envío de correos electrónicos.
+     *
+     * @return una instancia configurada de {@link JavaMailSender}.
+     */
+
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -49,6 +81,12 @@ public class EmailConfig {
         mailSender.setPassword(password);
         return mailSender;
     }
+
+    /**
+     * Define un bean de tipo {@link ResourceLoader} para cargar recursos en la aplicación.
+     *
+     * @return una instancia de {@link DefaultResourceLoader}.
+     */
 
     @Bean
     public ResourceLoader getResourceLoader() {

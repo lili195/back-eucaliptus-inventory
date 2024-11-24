@@ -11,6 +11,18 @@ import org.thymeleaf.context.Context;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Servicio de envío de correos electrónicos.
+ * <p>
+ * Esta clase maneja el envío de correos electrónicos para diferentes propósitos como la recuperación de contraseñas
+ * y el envío de credenciales de usuario. Utiliza {@link JavaMailSender} para la creación y envío de los mensajes,
+ * y {@link TemplateEngine} para procesar las plantillas de correo electrónico con los datos proporcionados.
+ * </p>
+ *
+ * @see JavaMailSender
+ * @see TemplateEngine
+ */
+
 @Service
 public class EmailService {
 
@@ -20,10 +32,28 @@ public class EmailService {
     @Value("${spring.mail.host}")
     private String username;
 
+    /**
+     * Constructor de la clase {@link EmailService}.
+     *
+     * @param mailSender El objeto que envía los correos electrónicos.
+     * @param templateEngine El motor de plantillas utilizado para procesar los correos electrónicos.
+     */
+
     public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
     }
+
+    /**
+     * Envía un correo electrónico para la recuperación de la contraseña.
+     * <p>
+     * Este método envía un correo electrónico con un código de recuperación de contraseña a la dirección de correo
+     * especificada.
+     * </p>
+     *
+     * @param to La dirección de correo electrónico a la que se enviará el mensaje.
+     * @param code El código de recuperación de la contraseña.
+     */
 
     public void sendEmailPasswordRecovery(String to, int code) {
         MimeMessage message = mailSender.createMimeMessage();
@@ -47,6 +77,19 @@ public class EmailService {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Envía un correo electrónico con las credenciales de usuario.
+     * <p>
+     * Este método envía un correo electrónico con el nombre de usuario y la contraseña proporcionados al usuario
+     * especificado.
+     * </p>
+     *
+     * @param to La dirección de correo electrónico a la que se enviará el mensaje.
+     * @param username El nombre de usuario del destinatario.
+     * @param password La contraseña del destinatario.
+     * @return {@code true} si el correo se envió correctamente, {@code false} si ocurrió un error.
+     */
 
     public boolean sendEmailCredentials(String to, String username, String password) {
         MimeMessage message = mailSender.createMimeMessage();
@@ -73,5 +116,4 @@ public class EmailService {
             return false;
         }
     }
-
 }

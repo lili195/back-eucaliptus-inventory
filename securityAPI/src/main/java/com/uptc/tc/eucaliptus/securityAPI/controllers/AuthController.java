@@ -25,6 +25,14 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con la autenticación y autorización de usuarios.
+ * <p>
+ * Este controlador proporciona funcionalidades como inicio de sesión, recuperación de contraseñas,
+ * gestión de usuarios (crear, actualizar, eliminar) y manejo de roles.
+ * </p>
+ */
+
 @RestController()
 @RequestMapping("/auth")
 public class AuthController {
@@ -37,6 +45,18 @@ public class AuthController {
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Constructor de la clase.
+     *
+     * @param userService          servicio para gestionar usuarios.
+     * @param roleService          servicio para gestionar roles.
+     * @param emailService         servicio para enviar correos electrónicos.
+     * @param recoveryCodeService  servicio para gestionar códigos de recuperación.
+     * @param passwordEncoder      codificador de contraseñas.
+     * @param jwtProvider          proveedor de tokens JWT.
+     * @param authenticationManager gestor de autenticación.
+     */
+
     @Autowired
     public AuthController(UserService userService, RoleService roleService, EmailService emailService, RecoveryCodeService recoveryCodeService, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -47,6 +67,17 @@ public class AuthController {
         this.jwtProvider = jwtProvider;
         this.authenticationManager = authenticationManager;
     }
+
+    /**
+     * Maneja la solicitud de inicio de sesión.
+     *
+     * @param response   respuesta HTTP.
+     * @param request    solicitud HTTP.
+     * @param loginUser  objeto que contiene las credenciales del usuario.
+     * @param bidBindingResult resultado de la validación del formulario.
+     * @return un token JWT si las credenciales son válidas.
+     */
+
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(HttpServletResponse response, HttpServletRequest request,
@@ -69,6 +100,17 @@ public class AuthController {
         }
     }
 
+    /**
+     * Añade un vendedor al sistema.
+     * <p>
+     * Solo accesible para usuarios con el rol de administrador.
+     * </p>
+     *
+     * @param userDTO datos del usuario a registrar.
+     * @return el usuario registrado o un mensaje de error.
+     */
+
+
     @PostMapping("/addSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> addSeller(@Valid @RequestBody UserDTO userDTO){
@@ -90,6 +132,15 @@ public class AuthController {
         }
     }
 
+    /**
+     * Cambia la contraseña de un usuario.
+     *
+     * @param loginUser        credenciales del usuario.
+     * @param bidBindingResult resultado de la validación del formulario.
+     * @param request          solicitud HTTP con el token JWT en la cabecera.
+     * @return una respuesta HTTP indicando el éxito o error de la operación.
+     */
+
     @PostMapping("/changePassword")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> changePassword(@RequestBody LoginUser loginUser, BindingResult bidBindingResult,
@@ -110,6 +161,14 @@ public class AuthController {
             return new ResponseEntity<>(new Message("Token invalido"), HttpStatus.BAD_REQUEST);
         }
     }
+
+    /**
+     * Actualiza la información de un usuario.
+     *
+     * @param updateUserDTO datos actualizados del usuario.
+     * @param request       solicitud HTTP con el token JWT en la cabecera.
+     * @return un mensaje indicando el resultado de la operación.
+     */
 
     @PutMapping("/updateUserInfo")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -134,6 +193,16 @@ public class AuthController {
         }
     }
 
+    /**
+     * Elimina un vendedor del sistema.
+     * <p>
+     * Solo accesible para usuarios con el rol de administrador.
+     * </p>
+     *
+     * @param username nombre de usuario del vendedor a eliminar.
+     * @return un mensaje indicando el resultado de la operación.
+     */
+
     @DeleteMapping("/deleteSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteSeller(@RequestParam String username ){
@@ -145,10 +214,26 @@ public class AuthController {
         }
     }
 
+    /**
+     * Cierra la sesión del usuario.
+     *
+     * @param response respuesta HTTP.
+     * @param request  solicitud HTTP.
+     * @return un mensaje confirmando el cierre de sesión.
+     */
+
     @GetMapping("/logout")
     public ResponseEntity<Object> logout(HttpServletResponse response, HttpServletRequest request){
         return new ResponseEntity<>(new Message("Se ha cerrado la sesion"), HttpStatus.OK);
     }
+
+    /**
+     * Solicita un código de recuperación de contraseña.
+     *
+     * @param email dirección de correo del usuario.
+     * @return un mensaje confirmando el envío del código o un mensaje de error.
+     */
+
 
     @PostMapping("/requestRecoveryPassword/{email}")
     public ResponseEntity<Object> requestRecoveryPassword(@PathVariable String email){
@@ -168,6 +253,14 @@ public class AuthController {
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Valida un código de recuperación de contraseña.
+     *
+     * @param recoveryCodeDTO datos del código de recuperación.
+     * @return un mensaje indicando el resultado de la validación.
+     */
+
 
     @PostMapping("/validateRecoveryCode")
     public ResponseEntity<Object> validateRecoveryCode(@RequestBody RecoveryCodeDTO recoveryCodeDTO){
@@ -189,6 +282,13 @@ public class AuthController {
         }
     }
 
+    /**
+     * Recupera la contraseña de un usuario utilizando un código de recuperación válido.
+     *
+     * @param recoveryPasswordDTO datos del código y nueva contraseña.
+     * @return un mensaje indicando el resultado de la operación.
+     */
+
     @PostMapping("/recoveryPassword")
     public ResponseEntity<Object> recoveryPassword(@RequestBody RecoveryPasswordDTO recoveryPasswordDTO){
         try{
@@ -207,5 +307,4 @@ public class AuthController {
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
