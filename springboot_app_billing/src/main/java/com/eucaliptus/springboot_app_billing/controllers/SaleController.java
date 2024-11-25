@@ -1,14 +1,11 @@
 package com.eucaliptus.springboot_app_billing.controllers;
 
-import com.eucaliptus.springboot_app_billing.dto.DatesDTO;
-import com.eucaliptus.springboot_app_billing.dto.SaleDTO;
-import com.eucaliptus.springboot_app_billing.dto.SaleDetailDTO;
+import com.eucaliptus.springboot_app_billing.dto.*;
 import com.eucaliptus.springboot_app_billing.mappers.SaleDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.SaleMapper;
 import com.eucaliptus.springboot_app_billing.model.Sale;
 import com.eucaliptus.springboot_app_billing.model.Summary;
 import com.eucaliptus.springboot_app_billing.service.*;
-import com.eucaliptus.springboot_app_products.dto.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +28,8 @@ public class SaleController {
     private SummaryService summaryService;
     @Autowired
     private APIService apiService;
+    @Autowired
+    private SendBillService sendBillService;
 
     @PostMapping("/addSale")
     public ResponseEntity<Object> addSale(@RequestBody SaleDTO saleDTO, HttpServletRequest request) {
@@ -83,6 +82,25 @@ public class SaleController {
     public ResponseEntity<Object> getProductsSale(@RequestBody DatesDTO dates) {
         try {
             return new ResponseEntity<>(saleDetailService.getProductsSaleByRangeDate(dates.getStartDate(), dates.getEndDate()), HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/sendEmail/{idSale}")
+    public ResponseEntity<Object> sendEmail(@PathVariable int idSale, HttpServletRequest request) {
+        try {
+            Optional<Sale> opSale= saleService.getSaleById(idSale);
+            if (opSale.isEmpty())
+                return new ResponseEntity<>(new Message("Venta no encontrada"), HttpStatus.BAD_REQUEST);
+            SaleDTO saleDTO = SaleMapper.saleToSaleDTO(opSale.get());
+            List<SaleDetailDTO> saleDetailDTOS = saleDetailService.getSalesBySale(saleDTO.getIdSale()).stream().
+                    map(SaleDetailMapper::saleDetailToSaleDetailDTO).toList();
+            saleDetailDTOS = productService.getSaleDetails(saleDetailDTOS, apiService.getTokenByRequest(request));
+            saleDTO.setSaleDetails(saleDetailDTOS);
+            sendBillService.sendSale(saleDTO.getClientDTO().getEmail(), saleDTO);
+            return new ResponseEntity<>(saleDTO, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);

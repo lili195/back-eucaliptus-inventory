@@ -1,5 +1,7 @@
 package com.eucaliptus.springboot_app_billing.service;
 
+import com.eucaliptus.springboot_app_billing.dto.NewBatchDTO;
+import com.eucaliptus.springboot_app_billing.dto.ProviderDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseDetailMapper;
@@ -8,13 +10,9 @@ import com.eucaliptus.springboot_app_billing.model.Purchase;
 import com.eucaliptus.springboot_app_billing.model.PurchaseDetail;
 import com.eucaliptus.springboot_app_billing.repository.PurchaseRepository;
 import com.eucaliptus.springboot_app_billing.utlities.ServicesUri;
-import com.eucaliptus.springboot_app_person.dtos.ProviderDTO;
-import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
-import com.eucaliptus.springboot_app_products.dto.ProductDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

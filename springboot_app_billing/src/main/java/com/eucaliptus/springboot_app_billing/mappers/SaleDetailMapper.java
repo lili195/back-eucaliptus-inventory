@@ -1,9 +1,9 @@
 package com.eucaliptus.springboot_app_billing.mappers;
 
 
+import com.eucaliptus.springboot_app_billing.dto.RequestBatchDTO;
 import com.eucaliptus.springboot_app_billing.dto.SaleDetailDTO;
 import com.eucaliptus.springboot_app_billing.model.SaleDetail;
-import com.eucaliptus.springboot_app_products.dto.RequestBatchDTO;
 
 public class SaleDetailMapper {
     public static SaleDetail saleDetailDTOToSaleDetail(SaleDetailDTO saleDetailDTO) {

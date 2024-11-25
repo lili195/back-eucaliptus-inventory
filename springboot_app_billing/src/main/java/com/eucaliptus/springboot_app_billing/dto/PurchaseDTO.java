@@ -1,6 +1,5 @@
 package com.eucaliptus.springboot_app_billing.dto;
 
-import com.eucaliptus.springboot_app_person.dtos.ProviderDTO;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

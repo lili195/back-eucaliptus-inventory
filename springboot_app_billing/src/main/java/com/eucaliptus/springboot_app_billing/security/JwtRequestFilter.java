@@ -1,6 +1,6 @@
 package com.eucaliptus.springboot_app_billing.security;
 
-import com.eucaliptus.springboot_app_products.utlities.ServicesUri;
+import com.eucaliptus.springboot_app_billing.utlities.ServicesUri;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -9,16 +9,12 @@ import java.util.Date;
 @Data
 @Getter
 @Setter
-public class PurchaseDetailDTO {
-    private int idPurchaseDetail;
+public class NewBatchDTO {
     private String idProduct;
-    private ProductDTO productDTO;
+    private Long idPurchaseDetail;
     private Date batchPurchase;
     private int quantityPurchased;
-    private Double purchasePrice;
-    private Double purchasePriceWithoutIva;
     private Double salePrice;
     private Double salePriceWithoutIva;
-    private int iva;
     private Date purchaseDueDate;
 }

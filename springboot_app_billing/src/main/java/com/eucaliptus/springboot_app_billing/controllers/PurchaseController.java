@@ -1,16 +1,14 @@
 package com.eucaliptus.springboot_app_billing.controllers;
 
 import com.eucaliptus.springboot_app_billing.dto.DatesDTO;
+import com.eucaliptus.springboot_app_billing.dto.Message;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.PurchaseMapper;
 import com.eucaliptus.springboot_app_billing.model.Purchase;
-import com.eucaliptus.springboot_app_billing.service.APIService;
-import com.eucaliptus.springboot_app_billing.service.ProductService;
-import com.eucaliptus.springboot_app_billing.service.PurchaseDetailService;
-import com.eucaliptus.springboot_app_billing.service.PurchaseService;
-import com.eucaliptus.springboot_app_products.dto.Message;
+import com.eucaliptus.springboot_app_billing.security.JwtTokenUtil;
+import com.eucaliptus.springboot_app_billing.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +30,10 @@ public class PurchaseController {
     private ProductService productService;
     @Autowired
     private APIService apiService;
+    @Autowired
+    private SendBillService sendBillService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/add")
     public ResponseEntity<Object> addPurchase(@RequestBody PurchaseDTO purchaseDTO, HttpServletRequest request) {
@@ -75,6 +77,27 @@ public class PurchaseController {
             purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, apiService.getTokenByRequest(request));
             purchaseDTO.setProviderDTO(purchaseService.getProvider(purchaseDTO.getProviderId(), apiService.getTokenByRequest(request)));
             purchaseDTO.setPurchaseDetails(purchaseDetailDTOS);
+            return new ResponseEntity<>(purchaseDTO, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new Message("Intente de nuevo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/sendEmail/{idPurchase}")
+    public ResponseEntity<Object> sendEmail(@PathVariable int idPurchase, HttpServletRequest request) {
+        try {
+            Optional<Purchase> opPurchase = purchaseService.getById(idPurchase);
+            if (opPurchase.isEmpty())
+                return new ResponseEntity<>(new Message("Compra no encontrada"), HttpStatus.BAD_REQUEST);
+            PurchaseDTO purchaseDTO = PurchaseMapper.purchaseToPurchaseDTO(opPurchase.get());
+            List<PurchaseDetailDTO> purchaseDetailDTOS = purchaseDetailService.findByPurchaseId(purchaseDTO.getPurchaseId()).stream().
+                    map(PurchaseDetailMapper::purchaseDetailToPurchaseDetailDTO).toList();
+            purchaseDetailDTOS = productService.getPurchaseDetails(purchaseDetailDTOS, apiService.getTokenByRequest(request));
+            purchaseDTO.setProviderDTO(purchaseService.getProvider(purchaseDTO.getProviderId(), apiService.getTokenByRequest(request)));
+            purchaseDTO.setPurchaseDetails(purchaseDetailDTOS);
+            String email = jwtTokenUtil.extractAllClaims(apiService.getTokenByRequest(request)).get("email").toString();
+            sendBillService.sendPurchase(email, purchaseDTO);
             return new ResponseEntity<>(purchaseDTO, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();

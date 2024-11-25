@@ -1,8 +1,6 @@
 package com.eucaliptus.springboot_app_billing.service;
 
-import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
-import com.eucaliptus.springboot_app_billing.dto.SaleDTO;
-import com.eucaliptus.springboot_app_billing.dto.SaleDetailDTO;
+import com.eucaliptus.springboot_app_billing.dto.*;
 import com.eucaliptus.springboot_app_billing.mappers.ClientMapper;
 import com.eucaliptus.springboot_app_billing.mappers.SaleDetailMapper;
 import com.eucaliptus.springboot_app_billing.mappers.SaleMapper;
@@ -11,8 +9,6 @@ import com.eucaliptus.springboot_app_billing.model.Sale;
 import com.eucaliptus.springboot_app_billing.model.SaleDetail;
 import com.eucaliptus.springboot_app_billing.repository.SaleRepository;
 import com.eucaliptus.springboot_app_billing.utlities.ServicesUri;
-import com.eucaliptus.springboot_app_person.dtos.SellerDTO;
-import com.eucaliptus.springboot_app_products.dto.RequestBatchDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;

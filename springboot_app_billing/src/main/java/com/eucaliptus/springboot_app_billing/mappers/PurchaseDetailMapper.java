@@ -1,8 +1,8 @@
 package com.eucaliptus.springboot_app_billing.mappers;
 
+import com.eucaliptus.springboot_app_billing.dto.NewBatchDTO;
 import com.eucaliptus.springboot_app_billing.dto.PurchaseDetailDTO;
 import com.eucaliptus.springboot_app_billing.model.PurchaseDetail;
-import com.eucaliptus.springboot_app_products.dto.NewBatchDTO;
 
 public class PurchaseDetailMapper {
 

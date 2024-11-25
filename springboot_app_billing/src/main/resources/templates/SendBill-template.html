@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:last-child td {
+            font-weight: bold;
+            background-color: #e5e5e5;
+        }
+        .container {
+            background-color: #ffffff;
+            border: 1px solid #6c6c6c;
+            padding: 20px 40px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+            font-family: Arial, sans-serif;
+        }
+        .header, .footer {
+            text-align: center;
+        }
+        .details, .table-wrapper {
+            margin: 20px 0;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Cabecera -->
+    <div class="header">
+        <img src="cid:logo2.png" alt="Logo Empresa" style="max-height: 60px;">
+        <h3 th:text="${companyName}">Nombre de la Empresa</h3>
+        <p th:text="'NIT: ' + ${companyNIT}">NIT: 123456789</p>
+        <p th:text="'Dirección: ' + ${companyAddress}">Dirección: Calle 123 4-12</p>
+        <p th:text="'Celular: ' + ${companyPhone}">Celular: 3128888829</p>
+    </div>
+    <!-- Información de la factura -->
+    <div class="details">
+        <h3>Información de la Factura</h3>
+        <p th:text="'Número de Factura: ' + ${idBill}">Número de Factura: [idBill]</p>
+        <p th:text="'Fecha de Emisión: ' + ${dateBill}">Fecha de Emisión: [dateBill]</p>
+    </div>
+    <!-- Datos del cliente -->
+    <div th:if="${isClient}">
+        <!-- Esta sección solo se muestra si es un cliente -->
+        <h3>Datos del Cliente</h3>
+        <p th:text="'Documento: ' + ${clientData.idClient}">Documento: [idClient]</p>
+        <p th:text="'Nombre: ' + ${clientData.nameClient}">Nombre: [nameClient]</p>
+        <p th:text="'Correo: ' + ${clientData.email}">Correo: [email]</p>
+    </div>
+
+    <div th:if="${isProvider}">
+        <!-- Esta sección solo se muestra si es un proveedor -->
+        <h3>Datos del Proveedor</h3>
+        <p th:text="'NIT: ' + ${providerNit}">NIT: [nit]</p>
+        <p th:text="'Nombre: ' + ${providerName}">Nombre: [name]</p>
+        <p th:text="'Teléfono: ' + ${providerPhone}">Teléfono: [phone]</p>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Uso</th>
+                <th>Precio Unitario</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Filas dinámicas -->
+            <tr th:each="row : ${rows}">
+                <td th:text="${row.productDTO.productName}">Producto A</td>
+                <td th:text="${row.productDTO.use}">Uso A</td>
+                <td th:text="${row.unitPrice}">10,000</td>
+                <td th:text="${row.quantity}">2</td>
+                <td th:text="${row.subtotal}">20,000</td>
+            </tr>
+            <!-- Subtotales -->
+            <tr>
+                <td colspan="3" style="text-align: right;">Subtotal</td>
+                <td colspan="2" th:text="${invoiceSubtotal}">50,000</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: right;">IVA</td>
+                <td colspan="2" th:text="${invoiceTaxes}">9,500</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: right;">Total</td>
+                <td colspan="2" th:text="${invoiceTotal}">59,500</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Pie de página -->
+    <div class="footer">
+        <p>Gracias por su compra.</p>
+    </div>
+</div>
+</body>
+</html>

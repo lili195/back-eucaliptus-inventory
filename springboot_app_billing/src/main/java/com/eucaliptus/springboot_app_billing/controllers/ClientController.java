@@ -1,10 +1,10 @@
 package com.eucaliptus.springboot_app_billing.controllers;
 
 import com.eucaliptus.springboot_app_billing.dto.ClientDTO;
+import com.eucaliptus.springboot_app_billing.dto.Message;
 import com.eucaliptus.springboot_app_billing.mappers.ClientMapper;
 import com.eucaliptus.springboot_app_billing.model.Client;
 import com.eucaliptus.springboot_app_billing.service.ClientService;
-import com.eucaliptus.springboot_app_products.dto.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
