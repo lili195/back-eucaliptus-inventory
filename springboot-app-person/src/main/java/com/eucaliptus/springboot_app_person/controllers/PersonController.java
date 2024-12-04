@@ -14,6 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controlador REST para gestionar las operaciones relacionadas con las personas.
+ * <p>
+ * Este controlador proporciona varios endpoints para gestionar las personas, incluidos
+ * la obtención de todas las personas, la búsqueda de una persona por su ID y la
+ * obtención del administrador.
+ * </p>
+ */
 @RestController
 @RequestMapping("/person")
 public class PersonController {
@@ -21,11 +29,22 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
+    /**
+     * Obtiene todas las personas.
+     *
+     * @return una lista de todas las personas.
+     */
     @GetMapping
     public List<Person> getAllPersons() {
         return personService.getAllPersons();
     }
 
+    /**
+     * Obtiene una persona por su ID.
+     *
+     * @param id el ID de la persona a obtener.
+     * @return una respuesta con la persona encontrada o un estado "Bad Request" si no se encuentra.
+     */
     @GetMapping("/getPersonById/{id}")
     public ResponseEntity<Person> getPersonById(@PathVariable String id) {
         return personService.getPersonById(id)
@@ -33,6 +52,12 @@ public class PersonController {
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
+    /**
+     * Obtiene el administrador del sistema.
+     * Este endpoint está restringido a usuarios con el rol de "ROLE_ADMIN".
+     *
+     * @return una respuesta con el administrador encontrado, o un mensaje de error si no se encuentra.
+     */
     @GetMapping("/getAdmin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> getAdmin(){

@@ -13,12 +13,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar notificaciones relacionadas con el stock.
+ *
+ * <p>Este controlador proporciona un endpoint para obtener notificaciones
+ * sobre el estado del stock de productos. Solo usuarios con roles específicos
+ * tienen acceso a esta funcionalidad.</p>
+ */
+
 @RestController
 @RequestMapping("/notification")
 public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
+
+    /**
+     * Endpoint para obtener las notificaciones principales sobre el stock de productos.
+     *
+     * <p>Este método está protegido mediante autorización, permitiendo acceso solo
+     * a usuarios con los roles <code>ROLE_ADMIN</code> o <code>ROLE_SELLER</code>.</p>
+     *
+     * @return una respuesta HTTP con la lista de notificaciones del stock en formato DTO o
+     * un mensaje de error en caso de fallo.
+     */
 
     @PostMapping("/getStockNotifications")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")

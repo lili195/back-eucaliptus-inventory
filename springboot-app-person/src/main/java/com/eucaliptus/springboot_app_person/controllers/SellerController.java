@@ -17,6 +17,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador para la gestión de vendedores. Contiene métodos para obtener, crear, actualizar y eliminar vendedores.
+ * Los métodos están protegidos con control de acceso por roles utilizando anotaciones de seguridad.
+ */
 @RestController
 @RequestMapping("/person/sellers")
 public class SellerController {
@@ -34,6 +38,11 @@ public class SellerController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    /**
+     * Obtiene todos los vendedores activos.
+     *
+     * @return Una lista de vendedores activos en formato DTO.
+     */
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> getAllSellers() {
@@ -45,6 +54,12 @@ public class SellerController {
         }
     }
 
+    /**
+     * Obtiene un vendedor por su ID.
+     *
+     * @param id El ID del vendedor.
+     * @return El vendedor con el ID proporcionado.
+     */
     @GetMapping("/getSellerById/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> getSellerById(@PathVariable String id) {
@@ -57,6 +72,12 @@ public class SellerController {
         }
     }
 
+    /**
+     * Obtiene un vendedor por su nombre de usuario.
+     *
+     * @param username El nombre de usuario del vendedor.
+     * @return El vendedor asociado al nombre de usuario proporcionado.
+     */
     @GetMapping("/getSellerByUsername/{username}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getSellerByUsername(@PathVariable String username) {
@@ -69,6 +90,12 @@ public class SellerController {
         }
     }
 
+    /**
+     * Obtiene la información del vendedor utilizando el token JWT en la solicitud.
+     *
+     * @param request La solicitud HTTP que contiene el token JWT.
+     * @return La información del vendedor asociada al token JWT.
+     */
     @GetMapping("getSellerInfoByToken")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getSellerInfoByToken(HttpServletRequest request) {
@@ -83,6 +110,13 @@ public class SellerController {
         }
     }
 
+    /**
+     * Crea un nuevo vendedor.
+     *
+     * @param sellerDTO Los datos del vendedor a crear.
+     * @param request La solicitud HTTP que contiene el token de autorización.
+     * @return El vendedor creado en formato DTO.
+     */
     @PostMapping("/addSeller")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> createSeller(@RequestBody SellerDTO sellerDTO,
@@ -105,6 +139,13 @@ public class SellerController {
         }
     }
 
+    /**
+     * Actualiza los datos de un vendedor existente.
+     *
+     * @param idSeller El ID del vendedor a actualizar.
+     * @param sellerDetails Los detalles del vendedor a actualizar.
+     * @return El vendedor actualizado en formato DTO.
+     */
     @PutMapping("/updateSeller/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> updateSeller(@PathVariable("id") String idSeller, @RequestBody SellerDTO sellerDetails) {
@@ -120,6 +161,13 @@ public class SellerController {
         }
     }
 
+    /**
+     * Actualiza la información de usuario de un vendedor.
+     *
+     * @param updateUserDTO Los detalles de la actualización del usuario.
+     * @param request La solicitud HTTP que contiene el token de autorización.
+     * @return Un mensaje indicando el resultado de la actualización.
+     */
     @PutMapping("/updateUserInfo")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> updateUserInfo(@RequestBody UpdateUserDTO updateUserDTO, HttpServletRequest request) {
@@ -145,6 +193,13 @@ public class SellerController {
         }
     }
 
+    /**
+     * Elimina un vendedor.
+     *
+     * @param idSeller El ID del vendedor a eliminar.
+     * @param request La solicitud HTTP que contiene el token de autorización.
+     * @return Un mensaje indicando si la eliminación fue exitosa.
+     */
     @DeleteMapping("/deleteSeller/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteSeller(@PathVariable("id") String idSeller, HttpServletRequest request) {

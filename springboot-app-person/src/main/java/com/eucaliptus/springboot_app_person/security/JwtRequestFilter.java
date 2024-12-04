@@ -31,6 +31,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+
+/**
+ * Filtro que intercepta las solicitudes HTTP y extrae el token JWT del encabezado "Authorization".
+ * Valida el token JWT y, si es válido, establece la autenticación del usuario en el contexto de seguridad de Spring.
+ *
+ * Este filtro se ejecuta una sola vez por solicitud (a través de la clase {@link OncePerRequestFilter}) y es
+ * responsable de autenticar a los usuarios mediante tokens JWT en las solicitudes HTTP entrantes.
+ */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -39,7 +47,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private RestTemplate restTemplate;
 
-
+    /**
+     * Método que se ejecuta en cada solicitud para filtrar la autenticación.
+     * Extrae el token JWT del encabezado "Authorization", lo valida, y si es válido, configura la autenticación
+     * del usuario en el contexto de seguridad de Spring.
+     *
+     * @param request La solicitud HTTP.
+     * @param response La respuesta HTTP.
+     * @param filterChain La cadena de filtros que permite que la solicitud continúe.
+     * @throws ServletException Si ocurre un error en el procesamiento de la solicitud.
+     * @throws IOException Si ocurre un error en la entrada/salida de la solicitud.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -64,6 +82,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Método para validar el token JWT realizando una solicitud HTTP a un servicio de autenticación.
+     *
+     * @param token El token JWT que se desea validar.
+     * @return {@code true} si el token es válido, {@code false} si no lo es.
+     */
+
     private boolean isValidToken(String token) {
         HttpEntity<String> entity = new HttpEntity<>(token, getHeader(token).getHeaders());
         ResponseEntity<Boolean> response = restTemplate.exchange(
@@ -74,6 +99,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         );
         return response.getBody();
     }
+
+    /**
+     * Método para crear los encabezados HTTP necesarios para enviar el token JWT en una solicitud.
+     *
+     * @param token El token JWT que se desea incluir en los encabezados.
+     * @return Un objeto {@link HttpEntity} que contiene los encabezados con el token JWT.
+     */
 
     private HttpEntity<String> getHeader(String token){
         HttpHeaders headers = new HttpHeaders();

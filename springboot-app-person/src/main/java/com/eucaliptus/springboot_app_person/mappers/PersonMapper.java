@@ -3,19 +3,20 @@ package com.eucaliptus.springboot_app_person.mappers;
 import com.eucaliptus.springboot_app_person.dtos.PersonDTO;
 import com.eucaliptus.springboot_app_person.model.Person;
 
+/**
+ * Clase responsable de la conversión entre objetos de tipo {@link Person} y {@link PersonDTO}.
+ * Esta clase facilita el mapeo de datos entre la entidad {@link Person} y el DTO {@link PersonDTO},
+ * asegurando que la información pueda ser transferida entre las capas de la aplicación de manera eficiente.
+ */
+
 public class PersonMapper {
 
-//    public static Person personDTOToPerson(PersonDTO personDTO, Role role, DocumentType documentType) {
-//        Person person = new Person();
-//        person.setIdNumber(personDTO.getIdPerson());
-//        person.setFirstName(personDTO.getFirstName());
-//        person.setLastName(personDTO.getLastName());
-//        person.setEmail(personDTO.getEmail());
-//        person.setPhoneNumber(personDTO.getPhoneNumber());
-//        person.setDocumentType(documentType);
-//        person.setRole(role);
-//        return person;
-//    }
+    /**
+     * Convierte un objeto {@link Person} en un {@link PersonDTO}.
+     *
+     * @param person El objeto {@link Person} que contiene los datos a mapear.
+     * @return Un objeto {@link PersonDTO} con los datos mapeados desde el {@link Person}.
+     */
 
     public static PersonDTO personToPersonDTO(Person person) {
         PersonDTO personDTO = new PersonDTO();

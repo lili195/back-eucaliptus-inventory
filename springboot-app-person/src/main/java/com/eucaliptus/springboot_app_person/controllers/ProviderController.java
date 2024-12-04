@@ -20,6 +20,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar las operaciones relacionadas con los proveedores.
+ * <p>
+ * Este controlador está protegido por el rol "ROLE_ADMIN", y permite realizar diversas operaciones
+ * como obtener proveedores, validar y crear nuevos proveedores, actualizar y eliminar proveedores.
+ * </p>
+ */
 @RestController
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 @RequestMapping("/person/providers")
@@ -36,6 +43,11 @@ public class ProviderController {
     @Autowired
     private DocumentTypeService documentTypeService;
 
+    /**
+     * Obtiene todos los proveedores activos.
+     *
+     * @return una respuesta con una lista de todos los proveedores activos en formato DTO.
+     */
     @GetMapping("/all")
     public ResponseEntity<Object> getAllProviders() {
         try {
@@ -46,6 +58,13 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Obtiene un proveedor por su ID.
+     * Si el proveedor es una persona o una empresa, realiza la búsqueda correspondiente.
+     *
+     * @param id el ID del proveedor.
+     * @return una respuesta con el proveedor encontrado o un mensaje de error si no se encuentra.
+     */
     @GetMapping("/getProviderById/{id}")
     public ResponseEntity<Object> getProviderById(@PathVariable String id) {
         try{
@@ -63,6 +82,12 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Obtiene un proveedor (persona o empresa) por su ID.
+     *
+     * @param id el ID del proveedor.
+     * @return una respuesta con el proveedor encontrado o un mensaje de error si no se encuentra.
+     */
     @GetMapping("/getProvider/{id}")
     public ResponseEntity<Object> getProvider(@PathVariable String id) {
         try{
@@ -80,6 +105,12 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Obtiene una empresa por su NIT.
+     *
+     * @param nit el NIT de la empresa.
+     * @return una respuesta con los datos de la empresa si se encuentra, o un mensaje de error si no.
+     */
     @GetMapping("/getCompanyByNit/{nit}")
     public ResponseEntity<Object> getCompanyByNit(@PathVariable String nit){
         try{
@@ -93,6 +124,13 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Valida si es posible crear un nuevo proveedor.
+     * Verifica si la persona ya existe y si la empresa (si corresponde) ya está registrada.
+     *
+     * @param providerDTO los datos del nuevo proveedor.
+     * @return una respuesta con el resultado de la validación.
+     */
     @PostMapping("/validateNewProvider")
     public ResponseEntity<Object> validateNewProvider(@RequestBody ProviderDTO providerDTO) {
         try {
@@ -115,6 +153,13 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Crea un nuevo proveedor.
+     * Si el proveedor es de tipo jurídica, se asocia una empresa a este proveedor.
+     *
+     * @param providerDTO los datos del proveedor a crear.
+     * @return una respuesta con los datos del proveedor creado.
+     */
     @PostMapping("/addProvider")
     public ResponseEntity<Object> createProvider(@RequestBody ProviderDTO providerDTO) {
         try {
@@ -137,6 +182,13 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Actualiza la información de un proveedor existente.
+     *
+     * @param idProvider el ID del proveedor a actualizar.
+     * @param providerDetails los nuevos detalles del proveedor.
+     * @return una respuesta con los datos del proveedor actualizado.
+     */
     @PutMapping("/updateProvider/{id}")
     public ResponseEntity<Object> updateProvider(@PathVariable("id") String idProvider, @RequestBody ProviderDTO providerDetails) {
         try {
@@ -159,6 +211,12 @@ public class ProviderController {
         }
     }
 
+    /**
+     * Elimina un proveedor dado su ID.
+     *
+     * @param request el ID del proveedor a eliminar.
+     * @return una respuesta con el resultado de la eliminación.
+     */
     @DeleteMapping("/deleteProvider/{idProvider}")
     public ResponseEntity<Object> deleteProvider(@PathVariable String idProvider, HttpServletRequest request) {
         try {

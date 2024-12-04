@@ -27,6 +27,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+/**
+ * Controlador REST para gestionar los productos de la aplicación.
+ *
+ * <p>Proporciona endpoints para realizar operaciones CRUD sobre productos,
+ * como listar, crear, actualizar y eliminar productos. También incluye
+ * funcionalidades específicas como la gestión de productos por proveedor
+ * y la consulta de productos próximos a vencer.</p>
+ */
+
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -37,6 +47,12 @@ public class ProductController {
     private UnitService unitService;
     @Autowired
     private APIService apiService;
+
+    /**
+     * Obtiene todos los productos activos.
+     *
+     * @return una lista de productos en formato DTO o un mensaje de error si ocurre un problema.
+     */
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -49,6 +65,13 @@ public class ProductController {
         }
     }
 
+    /**
+     * Obtiene un producto por su ID.
+     *
+     * @param id el identificador único del producto.
+     * @return el producto en formato DTO o un mensaje de error si no se encuentra.
+     */
+
     @GetMapping("/getProductById/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getProductById(@PathVariable String id) {
@@ -60,6 +83,13 @@ public class ProductController {
             return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Obtiene múltiples productos por sus IDs.
+     *
+     * @param ids una lista de identificadores únicos de productos.
+     * @return una lista de productos en formato DTO o un mensaje de error si no se encuentran.
+     */
 
     @PostMapping("/getProductsById")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -78,6 +108,13 @@ public class ProductController {
         }
     }
 
+    /**
+     * Obtiene un producto por su nombre.
+     *
+     * @param productName el nombre del producto.
+     * @return el producto en formato DTO o un mensaje de error si no se encuentra.
+     */
+
     @GetMapping("getProductByName/{productName}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getProductByName(@PathVariable String productName) {
@@ -90,6 +127,13 @@ public class ProductController {
         }
     }
 
+    /**
+     * Obtiene productos asociados a un proveedor específico.
+     *
+     * @param providerId el identificador del proveedor.
+     * @return una lista de productos en formato DTO.
+     */
+
     @GetMapping("getProductsByProvider/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> getProductsByProvider(@PathVariable("id") String providerId) {
@@ -100,6 +144,14 @@ public class ProductController {
             return new ResponseEntity<>(new Message("Intentalo mas tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * Crea un nuevo producto.
+     *
+     * @param productDTO los datos del producto en formato DTO.
+     * @param request    el objeto HttpServletRequest para obtener información adicional.
+     * @return el producto creado en formato DTO o un mensaje de error.
+     */
 
     @PostMapping("/addProduct")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -124,6 +176,15 @@ public class ProductController {
         }
     }
 
+    /**
+     * Actualiza un producto existente.
+     *
+     * @param idProduct  el identificador del producto a actualizar.
+     * @param productDTO los nuevos datos del producto en formato DTO.
+     * @param request    el objeto HttpServletRequest para obtener información adicional.
+     * @return el producto actualizado en formato DTO o un mensaje de error.
+     */
+
     @PutMapping("/updateProduct/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<Object> updateProduct(@PathVariable("id") String idProduct, @RequestBody ProductDTO productDTO, HttpServletRequest request) {
@@ -147,6 +208,13 @@ public class ProductController {
         }
     }
 
+    /**
+     * Elimina un producto por su ID.
+     *
+     * @param idProduct el identificador del producto.
+     * @param request   el objeto HttpServletRequest para obtener información adicional.
+     * @return un mensaje de éxito o error.
+     */
 
     @DeleteMapping("/deleteProduct/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")
@@ -162,6 +230,8 @@ public class ProductController {
             return new ResponseEntity<>(new Message("Intente de nuevo más tarde"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     @DeleteMapping("/deleteProductsByProvider/{idProvider}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")

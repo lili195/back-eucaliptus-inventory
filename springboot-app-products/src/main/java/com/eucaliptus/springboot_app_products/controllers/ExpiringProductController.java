@@ -15,15 +15,41 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para gestionar productos con fechas de vencimiento.
+ *
+ * <p>Este controlador proporciona endpoints para acceder a los productos
+ * que están próximos a vencer. Solo usuarios con roles específicos
+ * tienen acceso a estas funcionalidades.</p>
+ */
+
+
 @RestController
 @RequestMapping("/api/products")
 public class ExpiringProductController {
+
+    /**
+     * Constructor para inyectar el servicio de productos próximos a vencer.
+     *
+     * @param service el servicio utilizado para manejar la lógica de negocio
+     *                relacionada con los productos próximos a vencer.
+     */
 
     private final ExpiringProductService service;
 
     public ExpiringProductController(ExpiringProductService service) {
         this.service = service;
     }
+
+    /**
+     * Endpoint para obtener una lista de productos con fechas próximas a vencer.
+     *
+     * <p>Este método está protegido por autorización, permitiendo acceso solo
+     * a usuarios con los roles <code>ROLE_ADMIN</code> o <code>ROLE_SELLER</code>.</p>
+     *
+     * @return una respuesta HTTP con la lista de productos próximos a vencer o
+     * un mensaje de error en caso de fallo.
+     */
 
     @GetMapping("/expiring")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')")

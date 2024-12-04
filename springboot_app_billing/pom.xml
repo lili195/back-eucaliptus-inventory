@@ -102,6 +102,7 @@
 		</dependency>
 
 		<dependency>
+<<<<<<< Updated upstream
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
@@ -129,6 +130,13 @@
 			<scope>test</scope>
 		</dependency>
 
+=======
+			<groupId>com.eucaliptus</groupId>
+			<artifactId>springboot-app-products</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+>>>>>>> Stashed changes
 	</dependencies>
 
 	<build>
@@ -143,6 +151,24 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.6.3</version>
+				<configuration>
+					<failOnError>false</failOnError>
 				</configuration>
 			</plugin>
 		</plugins>
